@@ -40,7 +40,7 @@ def fetch_wiki_metadata(titles, lang="he"):
         for page_id, p in pages.items():
             # Clean up categories
             raw_cats = p.get("categories", [])
-            clean_cats = [c["title"] for c in raw_cats]
+            clean_cats = [c["title"].replace("קטגוריה:", "").strip() for c in raw_cats]
 
             # Build the dictionary as per your requirements
             item = {
