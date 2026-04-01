@@ -47,7 +47,7 @@ def get_llm_picks(input_list) -> list[tuple[str, list[str]]]:
 
     <NUMBER>. Article: <ARTICLE_NAME>. Categories: <FILTERED_CATEGORY_LIST>
 
-
+    ARTICLE_NAME should be the exact title of the article as given in the input list.
     FILTERED_CATEGORY_LIST should contain the list of categories, comma separated, after removing the revealing categories mentioned above.
 
     The list of articles to select from:

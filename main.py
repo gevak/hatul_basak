@@ -10,6 +10,7 @@ from supabase import create_client, Client
 from typing import List
 from dotenv import load_dotenv
 
+from wiki_utils import fetch_wiki_metadata
 
 load_dotenv()
 
@@ -36,63 +37,6 @@ class Submission(BaseModel):
 class ManualPuzzleRequest(BaseModel):
     titles: List[str]
 
-# --- Helper Functions ---
-
-async def fetch_wikipedia_data(titles: List[str]) -> list:
-    """Fetches categories, extracts, and images from Hebrew Wikipedia."""
-    titles_param = "|".join(titles)
-    url = "https://he.wikipedia.org/w/api.php"
-    
-    # Wikipedia requires a descriptive User-Agent header
-    headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.52 Safari/537.36" 
-    }
-    
-    params = {
-        "origin": "*",
-        "action": "query",
-        "format": "json",
-        "prop": "categories|extracts|info|pageimages",
-        "pithumbsize": 400,
-        "clshow": "!hidden",
-        "cllimit": "max",
-        "exintro": 1,
-        "explaintext": 1,
-        "titles": titles_param
-    }
-    
-    async with httpx.AsyncClient() as client:
-        # Pass headers and params separately for cleaner code
-        response = await client.get(url, headers=headers, params=params)
-        
-        if response.status_code != 200:
-            print(f"Wiki API Error: {response.status_code}")
-            return []
-            
-        data = response.json()
-        
-    pages = []
-    if "query" in data and "pages" in data["query"]:
-        for p in data["query"]["pages"].values():
-            if "missing" in p:
-                continue
-            
-            # Clean categories
-            raw_cats = p.get("categories", [])
-            clean_cats = [
-                c["title"].replace("קטגוריה:", "") for c in raw_cats
-                if not any(x in c["title"] for x in ["ויקיפדיה", "תחזוקה", "קצרמר", "שגיאות", "ערכים", "דפים"])
-            ]
-            
-            pages.append({
-                "title": p.get("title", ""),
-                "url": f"https://he.wikipedia.org/wiki/{p.get('title', '').replace(' ', '_')}",
-                "extract": p.get("extract", "").split('\n')[0] if p.get("extract") else "",
-                "categories": clean_cats,
-                "image": p.get("thumbnail", {}).get("source", None)
-            })
-    return pages
-
 # --- API Endpoints ---
 
 @app.get("/api/puzzles/daily")
@@ -114,7 +58,7 @@ async def get_puzzle(puzzle_id: str):
 @app.post("/api/puzzles/manual")
 async def create_manual_puzzle(req: ManualPuzzleRequest):
     """Creates a manually curated puzzle and saves it to DB to enable stats."""
-    wiki_data = await fetch_wikipedia_data(req.titles)
+    wiki_data = fetch_wiki_metadata(req.titles)
     if not wiki_data:
         raise HTTPException(status_code=400, detail="Could not fetch data for provided titles.")
     if len(wiki_data) != len(req.titles):
