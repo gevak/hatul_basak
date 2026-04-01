@@ -1,7 +1,10 @@
+import logging
+import os
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 HEADERS = {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.52 Safari/537.36" 
@@ -15,7 +18,7 @@ def fetch_wiki_metadata(titles, lang="he"):
     results = []
     
     # Wikipedia limits queries to 50 titles at a time for most properties
-    chunk_size = 50 
+    chunk_size = 20 
     for i in range(0, len(titles), chunk_size):
         chunk = titles[i : i + chunk_size]
         
@@ -28,6 +31,7 @@ def fetch_wiki_metadata(titles, lang="he"):
             "explaintext": True,  # Plain text, no HTML
             "cllimit": "max",
             "clshow": "!hidden",
+            "exlimit": "max",
             "pithumbsize": 500    # Image size
         }
 
@@ -37,7 +41,7 @@ def fetch_wiki_metadata(titles, lang="he"):
         for page_id, p in pages.items():
             # Clean up categories
             raw_cats = p.get("categories", [])
-            clean_cats = [c["title"].split(":", 1)[-1] for c in raw_cats]
+            clean_cats = [c["title"] for c in raw_cats]
 
             # Build the dictionary as per your requirements
             item = {
@@ -75,7 +79,7 @@ def get_wikipedia_pages(limit=10, titles=None, lang="he"):
     return fetch_wiki_metadata(random_titles, lang=lang)
 
 def wiki_item_to_string(item) -> str:
-    return item['title'] + "\n" + ', '.join(item.categories)
+    return item['title'] + "\n" + ', '.join(item['categories'])
 
 def generate_model_response(prompt, model):
   api_key = os.getenv('OPENROUTER_API_KEY')
@@ -128,6 +132,7 @@ def get_ai_picks(input_list) -> list[tuple[str, list[str]]]:
     prompt = PROMPT.format(input_list=input_list_str)
     result = []
     response = generate_model_response(prompt, model="google/gemini-3.1-flash-lite-preview")
+    logging.info(f"AI response:\n{response}")
     for line in response.splitlines():
         if line.strip() == "":
             continue
