@@ -9,12 +9,34 @@ from pydantic import BaseModel
 from supabase import create_client, Client
 from typing import List
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 # Initialize Supabase
 supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+
+def generate_model_response(prompt, model='anthropic/claude-opus-4.6'):
+  api_key = os.getenv('OPENROUTER_API_KEY')
+  if not api_key:
+      return "OPENROUTER_API_KEY was not set, you wanted to add that I would bet."
+  try:
+      response = requests.post(
+          url="https://openrouter.ai/api/v1/chat/completions",
+          headers={"Authorization": f"Bearer {api_key}"},
+          json={
+              "model": model,
+              "messages": [{"role": "user", "content": prompt}],
+          },
+          timeout=30,
+      )
+      response.raise_for_status()
+      data = response.json()
+      return data['choices'][0]['message']['content'].strip()
+
+  except Exception as e:
+      return f"Don't feel no terror, but I've got an error: {e}"
 
 async def fetch_wikipedia_data(titles: List[str]) -> list:
     """Fetches categories, extracts, and images from Hebrew Wikipedia."""
@@ -86,7 +108,9 @@ async def create_new_puzzle():
     }
     
     body = {
-        "model": "arcee-ai/trinity-mini:free", # You can change this to GPT-4o or Claude 3
+        "model": "google/gemini-3.1-flash-lite-preview",
+        # "model": "google/gemini-3.1-pro-preview",
+        # "model": "google/gemini-3-flash-preview",
         "messages": [{"role": "user", "content": prompt}]
     }
     
@@ -111,6 +135,7 @@ async def create_new_puzzle():
         "data": wiki_data
     }
     result = supabase.table("puzzles").insert(new_puzzle).execute()
+    logging.info(f"New daily puzzle created with ID: {result.data[0]['id']}")
     return {"message": "Daily puzzle generated successfully", "puzzle": result.data[0]}
 
 
