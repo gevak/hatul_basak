@@ -75,7 +75,7 @@ def get_wikipedia_pages(limit=10, titles=None, lang="he"):
 
 # 1. Get 5 Random Pages
 print("--- RANDOM PAGES ---")
-random_data = get_wikipedia_pages(limit=5)
+random_data = get_wikipedia_pages(limit=100)
 import json
 print(json.dumps(random_data, indent=4, ensure_ascii=False))
 
