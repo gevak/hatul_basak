@@ -117,7 +117,9 @@ async def create_manual_puzzle(req: ManualPuzzleRequest):
     wiki_data = await fetch_wikipedia_data(req.titles)
     if not wiki_data:
         raise HTTPException(status_code=400, detail="Could not fetch data for provided titles.")
-    
+    if len(wiki_data) != len(req.titles):
+        received_titles = {item['title'] for item in wiki_data}
+        raise HTTPException(status_code=400, detail="Some titles were not found on Wikipedia: [%s]" % [title for title in req.titles if title not in received_titles])
     new_puzzle = {
         "is_daily": False,
         "data": wiki_data
