@@ -430,16 +430,24 @@
 
         function checkGuess() {
             const guess = elInput.value.trim().toLowerCase();
-            const actual = pages[currentRound].title.toLowerCase();
-            
-            const distance = levenshtein(guess, actual);
-            const tolerance = actual.length > 8 ? 3 : 2;
-            const isCorrect = distance <= tolerance;
+            const currentPage = pages[currentRound];
+    
+            // Combine the main title and aliases into one array for checking
+            const validNames = [currentPage.title, ...(currentPage.aliases || [])];
+
+            // Use .some() to see if any name in the list meets the tolerance
+            const isCorrect = validNames.some(name => {
+                const actual = name.toLowerCase();
+                
+                // Dynamic tolerance based on the length of the specific alias being checked
+                const distance = levenshtein(guess, actual);
+                const tolerance = actual.length > 8 ? 3 : 2;
+                
+                return distance <= tolerance;
+            });
 
             elGuessingState.classList.add('hidden');
             elResultState.classList.remove('hidden');
-            
-            const currentPage = pages[currentRound];
             
             elCorrectAnswer.textContent = currentPage.title;
             elCorrectExtract.textContent = currentPage.extract || "לא נמצא תקציר לערך זה.";
