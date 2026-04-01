@@ -273,7 +273,7 @@
                 </div>
                 
                 <button id="next-btn">הבא</button>
-                <button id="retro-btn" class="secondary">בעצם ידעתי את זה! (+0.5)</button>
+                <button id="retro-btn" class="secondary">בעצם ידעתי את זה! (+1)</button>
             </div>
             
             <button id="show-creator-btn" class="secondary small">צור משחק משלך לשתף עם חברים</button>
@@ -477,8 +477,8 @@
 
         function claimRetroPoints() {
             if (currentRetroAvailable) {
-                score += 0.5;
-                articleScores[currentRound] = 0.5; // Update to partial
+                score += 1;
+                articleScores[currentRound] = 1;
                 elScore.textContent = score;
                 currentRetroAvailable = false;
                 elRetroBtn.classList.add('hidden');
