@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 # Initialize Supabase
 supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
-def generate_model_response(prompt, model='anthropic/claude-opus-4.6'):
+def generate_model_response(prompt, model):
   api_key = os.getenv('OPENROUTER_API_KEY')
   if not api_key:
       return "OPENROUTER_API_KEY was not set, you wanted to add that I would bet."
