@@ -1,3 +1,9 @@
+"""
+This is the main backend server for the Hatul Basak puzzle game. It serves API endpoints for fetching puzzles, submitting results, and also serves the frontend static files.
+To run locally, set-up a .env file, and run:
+uvicorn main:app --reload
+"""
+
 import os
 import json
 import httpx
@@ -7,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from supabase import create_client, Client
-from typing import List
+from typing import List, Optional
 from dotenv import load_dotenv
 
 from wiki_utils import fetch_wiki_metadata
@@ -55,21 +61,39 @@ async def get_puzzle(puzzle_id: str):
         raise HTTPException(status_code=404, detail="Puzzle not found")
     return response.data[0]
 
+# Define the shape of the incoming article from the frontend
+class ArticleItem(BaseModel):
+    url: str
+    image: Optional[str] = None
+    title: str
+    aliases: List[str] = []
+    extract: str
+    categories: List[str] = []
+
+# The payload wrapping the list of articles
+class ManualPuzzleRequest(BaseModel):
+    data: List[ArticleItem]
+
 @app.post("/api/puzzles/manual")
 async def create_manual_puzzle(req: ManualPuzzleRequest):
-    """Creates a manually curated puzzle and saves it to DB to enable stats."""
-    wiki_data = fetch_wiki_metadata(req.titles)
-    if not wiki_data:
-        raise HTTPException(status_code=400, detail="Could not fetch data for provided titles.")
-    if len(wiki_data) != len(req.titles):
-        received_titles = {item['title'] for item in wiki_data}
-        raise HTTPException(status_code=400, detail="Some titles were not found on Wikipedia: [%s]" % [title for title in req.titles if title not in received_titles])
+    """Saves a fully assembled puzzle directly from the frontend."""
+    
+    if not req.data or len(req.data) > 20:
+        raise HTTPException(status_code=400, detail="Puzzle must contain between 1 and 20 articles.")
+    
+    # Convert Pydantic models to dicts for Supabase insertion
     new_puzzle = {
         "is_daily": False,
-        "data": wiki_data
+        "data": [item.model_dump() for item in req.data]
     }
-    result = supabase.table("puzzles").insert(new_puzzle).execute()
-    return {"id": result.data[0]["id"]}
+    
+    try:
+        result = supabase.table("puzzles").insert(new_puzzle).execute()
+        return {"id": result.data[0]["id"]}
+    except Exception as e:
+        # Logging the error on your server side
+        print(f"Database insertion failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to save puzzle to database.")
 
 @app.post("/api/submissions")
 async def submit_results(sub: Submission):

@@ -227,6 +227,90 @@
             background: var(--accent-color);
             height: 100%;
         }
+
+        /* New Creator UI Styles */
+        .input-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-row input {
+            margin-bottom: 0;
+        }
+
+        .draft-article {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            text-align: right;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .draft-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--secondary-bg);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .draft-header h3 {
+            margin: 0;
+            color: var(--accent-color);
+        }
+
+        .remove-article-btn {
+            background-color: transparent;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            padding: 0.2rem 0.5rem;
+            font-size: 0.9rem;
+            width: auto;
+            margin: 0;
+        }
+
+        .remove-article-btn:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .cat-toggle {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .cat-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .cat-toggle.disabled {
+            opacity: 0.4;
+            text-decoration: line-through;
+            background-color: #374151; /* Neutral grey */
+        }
+
+        .alias-badge {
+            background-color: var(--secondary-bg);
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alias-remove {
+            cursor: pointer;
+            color: #fca5a5;
+            font-weight: bold;
+        }
+
+        .alias-remove:hover {
+            color: #ef4444;
+        }
     </style>
 </head>
 <body>
@@ -298,10 +382,19 @@
         <div id="creator-state" class="hidden">
             <h2>יצירת משחק מותאם אישית</h2>
             <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1rem;">
-                הדבק כאן קישורים לערכים בוויקיפדיה העברית (או רק את שמות הערכים), אחד בכל שורה. 
+                הוסף קישורים לערכים בוויקיפדיה העברית (או שמות ערכים). תוכל לערוך את הקטגוריות ולהוסיף כינויים חלופיים לפני השמירה.
             </p>
-            <textarea id="custom-links" rows="6" placeholder="https://he.wikipedia.org/wiki/ישראל&#10;אלברט איינשטיין&#10;..."></textarea>
-            <button id="generate-link-btn">צור משחק ושתף קישור</button>
+
+            <div id="draft-articles-container"></div>
+
+            <div class="input-row">
+                <input type="text" id="new-article-input" placeholder="https://he.wikipedia.org/wiki/... או שם ערך" autocomplete="off" onkeypress="if(event.key === 'Enter') addArticleFromInput()" />
+                <button id="add-article-btn" style="width: auto; white-space: nowrap;" onclick="addArticleFromInput()">הוסף ערך</button>
+            </div>
+            
+            <div id="draft-loading" class="hidden loader" style="margin-top: 0; margin-bottom: 1rem; font-size: 1rem;">מייבא נתונים מוויקיפדיה...</div>
+                        
+            <button id="generate-link-btn" class="hidden" style="margin-top: 1rem;">שמור משחק ושתף קישור</button>
             
             <div id="link-result-area" class="hidden" style="margin-top: 1rem;">
                 <p>הקישור שלך מוכן!</p>
@@ -315,7 +408,11 @@
 
     <script>
         // CONFIG
-        const API_BASE = 'https://hatulbasak-production.up.railway.app/api';
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        const API_BASE = isLocalhost 
+        ? 'http://127.0.0.1:8000/api' 
+        : 'https://hatulbasak-production.up.railway.app/api';
 
         // Game State
         let puzzleId = null;
@@ -552,48 +649,247 @@
             elCreatorState.classList.remove('hidden');
         }
 
-        async function createGameLink() {
-            const text = document.getElementById('custom-links').value;
-            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            
-            const titles = lines.map(line => {
-                try {
-                    if (line.startsWith('http')) {
-                        const url = new URL(line);
-                        const pathParts = url.pathname.split('/');
-                        return decodeURIComponent(pathParts[pathParts.length - 1]).replace(/_/g, ' ');
-                    }
-                } catch(e) {}
-                return line.replace(/_/g, ' ');
-            });
+        // --- NEW CREATOR LOGIC ---
+        let draftArticles = [];
 
-            if (titles.length === 0) {
-                alert("הזן לפחות ערך אחד");
+        async function fetchWikiDataFrontEnd(titleOrUrl) {
+            let title = titleOrUrl;
+            try {
+                // Extract title if user pasted a full URL
+                if (title.startsWith('http')) {
+                    const url = new URL(title);
+                    const pathParts = url.pathname.split('/');
+                    title = decodeURIComponent(pathParts[pathParts.length - 1]).replace(/_/g, ' ');
+                }
+            } catch(e) {}
+
+            // origin=* is critical to bypass CORS restrictions from the browser
+            const url = `https://he.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|categories|pageimages&titles=${encodeURIComponent(title)}&exintro=1&explaintext=1&cllimit=max&clshow=!hidden&exlimit=max&pithumbsize=500&origin=*`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const pages = data.query.pages;
+                const pageId = Object.keys(pages)[0];
+                
+                if (pageId === "-1") return null;
+
+                const p = pages[pageId];
+                const rawCats = p.categories || [];
+                const cleanCats = rawCats.map(c => c.title.replace("קטגוריה:", "").trim());
+                
+                // Grab the first two lines of the extract
+                const extractLines = (p.extract || "").split('\n').filter(l => l.trim() !== "").slice(0, 2).join('\n');
+
+                return {
+                    title: p.title,
+                    url: `https://he.wikipedia.org/wiki/${p.title.replace(/ /g, '_')}`,
+                    extract: extractLines,
+                    categories: cleanCats, 
+                    activeCategories: [...cleanCats], // State to track which categories the user kept
+                    image: p.thumbnail ? p.thumbnail.source : null,
+                    aliases: []
+                };
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        }
+
+        async function addArticleFromInput() {
+            const inputEl = document.getElementById('new-article-input');
+            const btnEl = document.getElementById('add-article-btn');
+            const val = inputEl.value.trim();
+            if (!val) return;
+
+            // Loading State
+            document.getElementById('draft-loading').classList.remove('hidden');
+            inputEl.disabled = true;
+            btnEl.disabled = true;
+
+            const articleData = await fetchWikiDataFrontEnd(val);
+
+            // Reset State
+            document.getElementById('draft-loading').classList.add('hidden');
+            inputEl.disabled = false;
+            btnEl.disabled = false;
+
+            if (!articleData || !articleData.categories.length || articleData.categories.some(c => c.includes('פירושונים'))) {
+                alert('לא מצאנו ערך בשם הזה. אתם בטוחים שהקלדתם את שם הערך במדויק? אם זה לא עובד, נסו להכניס את ה-URL של העמוד');
+                inputEl.focus();
                 return;
             }
+
+            draftArticles.push(articleData);
+            inputEl.value = '';
+            autoToggleOffCategories(draftArticles.length - 1); // Automatically toggle off categories based on title
+            renderDraftArticles();
+        }
+
+        const truncateString = (str, limit = 180) => {
+            if (!str) return "";
+
+            // 1. Find natural break points
+            const newlineIndex = str.indexOf('\n');
+            const dotSpaceIndex = str.indexOf('. ');
+
+            // 2. Initial cut based on whichever comes first
+            let cutoff = str.length;
+
+            if (newlineIndex !== -1) {
+                cutoff = Math.min(cutoff, newlineIndex);
+            }
             
-            elGenerateLinkBtn.textContent = "שומר בשרת...";
-            elGenerateLinkBtn.disabled = true;
+            if (dotSpaceIndex !== -1) {
+                // Include the dot (index + 1) but stop before the space
+                cutoff = Math.min(cutoff, dotSpaceIndex + 1);
+            }
+
+            // Perform the first slice
+            let truncated = str.slice(0, cutoff).trim();
+
+            // 3. Final check: if still over the character limit, cut at the last word
+            if (truncated.length > limit) {
+                const lastSpace = truncated.lastIndexOf(' ', limit);
+                const endPoint = lastSpace > -1 ? lastSpace : limit;
+                truncated = truncated.slice(0, endPoint).trim() + '...';
+            }
+
+            return truncated;
+        };
+
+        function renderDraftArticles() {
+            const container = document.getElementById('draft-articles-container');
+            container.innerHTML = '';
+
+            draftArticles.forEach((article, index) => {
+                const card = document.createElement('div');
+                card.className = 'draft-article';
+
+                const catsHtml = article.categories.map(cat => {
+                    const isActive = article.activeCategories.includes(cat);
+                    // Escape quotes in category names for the inline onclick handler
+                    const safeCat = cat.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    return `<span class="category cat-toggle ${isActive ? '' : 'disabled'}" onclick="toggleCategory(${index}, '${safeCat}')">${cat}</span>`;
+                }).join('');
+
+                const aliasesHtml = article.aliases.map((alias, aIdx) => {
+                    return `<span class="alias-badge">${alias} <span class="alias-remove" onclick="removeAlias(${index}, ${aIdx})">×</span></span>`;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="draft-header">
+                        <h3>${index + 1}. ${article.title}</h3>
+                        <button class="remove-article-btn" onclick="removeDraftArticle(${index})">הסר מהרשימה</button>
+                    </div>
+                    
+                    <p style="font-size: 0.95rem; opacity: 0.9; margin: 0.5rem 0; line-height: 1.5;">${truncateString(article.extract.split('\n')[0])}</p>
+
+                    <div style="margin: 1.5rem 0;">
+                        <strong style="font-size: 0.9rem; color: var(--accent-color);">קטגוריות (לחץ כדי להסתיר/להציג):</strong>
+                        <div class="categories" style="margin-top: 0.8rem;">
+                            ${catsHtml || '<span style="font-size:0.8rem; opacity:0.7">אין קטגוריות לערך זה</span>'}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                        <strong style="font-size: 0.9rem;">כינויים חלופיים (יזכו בניקוד מלא):</strong>
+                        <div style="display:flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="text" id="alias-input-${index}" placeholder="לדוגמה: כינוי נוסף לאדם, איות מקובל אחר..." style="margin-bottom:0; padding: 0.5rem; font-size: 0.9rem;" onkeypress="if(event.key === 'Enter') addAlias(${index})" />
+                            <button class="secondary" style="width:auto; padding: 0.5rem 1rem; margin:0;" onclick="addAlias(${index})">הוסף</button>
+                        </div>
+                        <div style="margin-top: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            ${aliasesHtml}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('generate-link-btn').classList.toggle('hidden', draftArticles.length === 0);
+        }
+
+        function autoToggleOffCategories(articleIdx) {
+            const normalize = (str) => str.replace(/[^\w\s\u0590-\u05FF]/gi, '').replace(/\s+/g, '').trim();
+            const article = draftArticles[articleIdx];
+            const cleanTitle = normalize(article.title);
+            for (let i = 0; i < article.categories.length; i++) {
+                const cat = article.categories[i];
+                const cleanCat = normalize(cat);
+                if (cleanCat.includes(cleanTitle)) {
+                    article.activeCategories = article.activeCategories.filter(c => c !== cat);
+                }
+            }
+            renderDraftArticles();
+        }
+
+        function toggleCategory(articleIdx, categoryName) {
+            const article = draftArticles[articleIdx];
+            if (article.activeCategories.includes(categoryName)) {
+                article.activeCategories = article.activeCategories.filter(c => c !== categoryName);
+            } else {
+                article.activeCategories.push(categoryName);
+            }
+            renderDraftArticles();
+        }
+
+        function addAlias(articleIdx) {
+            const input = document.getElementById(`alias-input-${articleIdx}`);
+            const val = input.value.trim();
+            if (val && !draftArticles[articleIdx].aliases.includes(val)) {
+                draftArticles[articleIdx].aliases.push(val);
+                input.value = '';
+                renderDraftArticles();
+            }
+        }
+
+        function removeAlias(articleIdx, aliasIdx) {
+            draftArticles[articleIdx].aliases.splice(aliasIdx, 1);
+            renderDraftArticles();
+        }
+
+        function removeDraftArticle(articleIdx) {
+            draftArticles.splice(articleIdx, 1);
+            renderDraftArticles();
+        }
+
+        // Rewritten Submit Function
+        async function createGameLink() {
+            if (draftArticles.length === 0) return;
+
+            const btn = document.getElementById('generate-link-btn');
+            btn.textContent = "שומר בשרת...";
+            btn.disabled = true;
+
+            // Prepare payload. Swap 'categories' with the 'activeCategories' user sculpted
+            const payload = draftArticles.map(article => ({
+                url: article.url,
+                image: article.image,
+                title: article.title,
+                aliases: article.aliases,
+                extract: article.extract,
+                categories: article.activeCategories
+            }));
 
             try {
                 const response = await fetch(`${API_BASE}/puzzles/manual`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ titles: titles })
+                    body: JSON.stringify({ data: payload }) // Sending the fully prepared payload
                 });
                 
-                const data = await response.json();
+                if (!response.ok) throw new Error("Failed to save puzzle");
                 
+                const data = await response.json();
                 const newUrl = window.location.origin + window.location.pathname + '?id=' + data.id;
-                const linkInput = document.getElementById('generated-link');
-                linkInput.value = newUrl;
+                document.getElementById('generated-link').value = newUrl;
                 document.getElementById('link-result-area').classList.remove('hidden');
             } catch (e) {
-                alert("אירעה שגיאה ביצירת המשחק.");
+                alert("אירעה שגיאה בשמירת המשחק.");
                 console.error(e);
             } finally {
-                elGenerateLinkBtn.textContent = "צור משחק ושתף קישור";
-                elGenerateLinkBtn.disabled = false;
+                btn.textContent = "שמור משחק ושתף קישור";
+                btn.disabled = false;
             }
         }
 
