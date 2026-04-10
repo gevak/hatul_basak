@@ -2,8 +2,22 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="utf-8" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hatulbasak.geekip.dev/">
+    <meta property="og:title" content="חתול בשק: משחק הניחושים של ויקיפדיה">
+    <meta property="og:description" content="חושבים שאתם מכירים הכל? נחשו את העמוד בויקיפדיה לפי הקטגוריות שלו. 10 אתגרים חדשים בכל יום על אנשים, מקומות ודברים.">
+    <meta property="og:image" content="https://hatulbasak.geekip.dev/static/preview-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="חתול בשק: משחק הניחושים של ויקיפדיה">
+    <meta property="twitter:description" content="מבחן ידע כללי יומי: מצליחים לנחש איזה ערך מסתתר מאחורי הקטגוריות?">
+    <meta property="twitter:image" content="https://hatulbasak.geekip.dev/static/preview-image.png">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
     <title>חתול בשק - משחק הניחושים של ויקיפדיה</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -462,7 +476,7 @@
         <div class="modal-content">
             <button class="close-modal-btn" id="close-modal-btn" title="סגור">&times;</button>
             <h2>איך משחקים?</h2>
-            <p><strong>נחשו את הערך בוויקיפדיה לפי הקטגוריות שהוא משתייך אליהן.</strong></p>
+            <p><strong>נחשו את הערך בויקיפדיה לפי הקטגוריות שהוא משתייך אליהן.</strong></p>
                 
                 <p>ברשימה היומית יופיעו 10 <strong>אנשים, מקומות או דברים</strong>, מפורסמים יותר או פחות, שתצטרכו לנחש.</p>
                 
@@ -486,7 +500,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z"/></svg>
             </button>
         </div>
-        <div class="subtitle" id="main-subtitle">נחש את הערך בוויקיפדיה לפי הקטגוריות</div>
+        <div class="subtitle" id="main-subtitle">נחש את הערך בויקיפדיה לפי הקטגוריות</div>
 
         <div id="loading" class="loader">
             טוען מערכת...<br>
@@ -553,7 +567,7 @@
         <div id="creator-state" class="hidden">
             <h2>יצירת משחק מותאם אישית</h2>
             <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1rem;">
-                הוסף קישורים לערכים בוויקיפדיה העברית (או שמות ערכים). תוכל לערוך את הקטגוריות ולהוסיף כינויים חלופיים לפני השמירה.
+                הוסף קישורים לערכים בויקיפדיה העברית (או שמות ערכים). תוכל לערוך את הקטגוריות ולהוסיף כינויים חלופיים לפני השמירה.
             </p>
 
             <div id="draft-articles-container"></div>
@@ -566,7 +580,7 @@
                 </button>
             </div>
             
-            <div id="draft-loading" class="hidden loader" style="margin-top: 0; margin-bottom: 1rem; font-size: 1rem;">מייבא נתונים מוויקיפדיה...</div>
+            <div id="draft-loading" class="hidden loader" style="margin-top: 0; margin-bottom: 1rem; font-size: 1rem;">מייבא נתונים מויקיפדיה...</div>
                          
             <button id="generate-link-btn" class="hidden" style="margin-top: 1rem;">שמור משחק ושתף קישור</button>
             
