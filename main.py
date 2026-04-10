@@ -1,12 +1,10 @@
 """
 This is the main backend server for the Hatul Basak puzzle game. It serves API endpoints for fetching puzzles, submitting results, and also serves the frontend static files.
 To run locally, set-up a .env file, and run:
-uvicorn main:app --reload
+python -m uvicorn main:app --reload
 """
 
 import os
-import json
-import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -15,8 +13,6 @@ from pydantic import BaseModel
 from supabase import create_client, Client
 from typing import List, Optional
 from dotenv import load_dotenv
-
-from wiki_utils import fetch_wiki_metadata
 
 load_dotenv()
 

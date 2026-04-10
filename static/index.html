@@ -13,12 +13,17 @@
         :root {
             --bg-color: #022c22;
             --text-color: #ecfeff;
+            --title-color: #fbbf24;
+            --subtitle-color: #34d399;
             --accent-color: #10b981;
-            --accent-hover: #059669;
+            --accent-hover: #059669; 
             --category-bg: #064e3b;
             --secondary-bg: #115e59;
             --error-color: #ef4444;
+            --link-color: #fbbf24;
         }
+
+        a { color: var(--link-color); }
 
         body {
             background-color: var(--bg-color);
@@ -28,6 +33,12 @@
             padding: 2rem 1rem;
             display: flex;
             justify-content: center;
+        }
+
+        svg {
+            width: 2rem;
+            height: 2rem;
+            fill: currentColor;
         }
 
         .container {
@@ -40,12 +51,15 @@
             text-align: center;
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
+            color: var(--title-color);
         }
 
         .subtitle {
             text-align: center;
             opacity: 0.8;
             margin-bottom: 2rem;
+            color: var(--subtitle-color);
+            font-weight: bold;
         }
 
         .status-bar {
@@ -71,6 +85,7 @@
             font-size: 1rem;
         }
 
+        /* Standard Inputs */
         input[type="text"], textarea {
             width: 100%;
             padding: 1rem;
@@ -88,6 +103,49 @@
             outline: none;
             border-color: var(--accent-color);
         }
+
+        /* --- NEW EMBEDDED FORM STYLES --- */
+        .embedded-form {
+            display: flex;
+            align-items: stretch;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--secondary-bg);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .embedded-form:focus-within {
+            border-color: var(--accent-color);
+        }
+
+        .embedded-form input[type="text"] {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            margin-bottom: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        /* Override focus inside the embedded form so the wrapper takes over */
+        .embedded-form input[type="text"]:focus {
+            border-color: transparent; 
+        }
+
+        .embedded-form button {
+            width: auto;
+            margin-bottom: 0;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0 1.5rem;
+            border-right: 2px solid var(--bg-color); /* Separator line between input and button */
+        }
+        /* -------------------------------- */
 
         button {
             background-color: var(--accent-color);
@@ -149,7 +207,6 @@
             border-right: 4px solid var(--accent-color);
         }
 
-        /* New wrapper for side-by-side layout */
         .result-main-content {
             display: flex;
             gap: 1.5rem;
@@ -157,26 +214,23 @@
             text-align: right;
         }
 
-        /* Container for the text to take up remaining space */
         .result-info {
             flex: 1;
         }
 
-        /* Updated image styling to prevent jumping */
         .result-image {
-            width: 220px;          /* Fixed width */
-            height: 220px;         /* Fixed height prevents vertical jump */
-            flex-shrink: 0;        /* Prevents the image from squeezing */
+            width: 220px;
+            height: 220px;
+            flex-shrink: 0;
             border-radius: 0.5rem;
             object-fit: cover;
-            background-color: rgba(255,255,255,0.05); /* Placeholder color while loading */
-            display: none;         /* Kept as none until JS shows it */
+            background-color: rgba(255,255,255,0.05);
+            display: none;
         }
 
-        /* Responsive fix for small screens */
         @media (max-width: 480px) {
             .result-main-content {
-                flex-direction: column-reverse; /* Stack on mobile if too tight */
+                flex-direction: column-reverse;
                 align-items: center;
             }
             .result-image {
@@ -198,7 +252,6 @@
             border-radius: 0.5rem;
         }
 
-        /* Stats specific styling */
         .stats-container {
             background: rgba(0,0,0,0.2);
             padding: 1.5rem;
@@ -226,17 +279,6 @@
         .stat-bar-fill {
             background: var(--accent-color);
             height: 100%;
-        }
-
-        /* New Creator UI Styles */
-        .input-row {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .input-row input {
-            margin-bottom: 0;
         }
 
         .draft-article {
@@ -289,7 +331,7 @@
         .cat-toggle.disabled {
             opacity: 0.4;
             text-decoration: line-through;
-            background-color: #374151; /* Neutral grey */
+            background-color: #374151;
         }
 
         .alias-badge {
@@ -332,28 +374,30 @@
 
             <div id="guessing-state">
                 <div class="categories" id="categories-container"></div>
-                <input type="text" id="guess-input" placeholder="שם הערך..." autocomplete="off" />
-                <button id="guess-btn">נחש</button>
+                
+                <form class="embedded-form" onsubmit="event.preventDefault(); document.getElementById('guess-btn').click();">
+                    <input type="text" id="guess-input" placeholder="שם הערך..." autocomplete="off" />
+                    <button type="submit" id="guess-btn" title="נחש [Enter]">
+                        נחש
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.<path d="M320 576C178.6 576 64 461.4 64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576zM438 209.7C427.3 201.9 412.3 204.3 404.5 215L285.1 379.2L233 327.1C223.6 317.7 208.4 317.7 199.1 327.1C189.8 336.5 189.7 351.7 199.1 361L271.1 433C276.1 438 282.9 440.5 289.9 440C296.9 439.5 303.3 435.9 307.4 430.2L443.3 243.2C451.1 232.5 448.7 217.5 438 209.7z"/></svg>
+                    </button>
+                </form>
             </div>
 
             <div id="result-state" class="hidden">
                 <div class="result-box">
                     <h2 id="result-title"></h2>
                     
-                    <!-- Wrapper starts here -->
                     <div class="result-main-content">
                         
-                        <!-- Right side: Text -->
                         <div class="result-info">
                             <p style="margin-top: 0;">התשובה הנכונה היא: <strong id="correct-answer"></strong></p>
                             <div id="correct-extract" class="extract-text"></div>
                         </div>
 
-                        <!-- Left side: Image -->
                         <img id="correct-image" class="result-image" alt="תמונת הערך" />
                         
                     </div>
-                    <!-- Wrapper ends here -->
                 </div>
                 
                 <button id="next-btn">הבא</button>
@@ -387,13 +431,16 @@
 
             <div id="draft-articles-container"></div>
 
-            <div class="input-row">
+            <div class="embedded-form" style="margin-bottom: 1.5rem;">
                 <input type="text" id="new-article-input" placeholder="https://he.wikipedia.org/wiki/... או שם ערך" autocomplete="off" onkeypress="if(event.key === 'Enter') addArticleFromInput()" />
-                <button id="add-article-btn" style="width: auto; white-space: nowrap;" onclick="addArticleFromInput()">הוסף ערך</button>
+                <button id="add-article-btn" onclick="addArticleFromInput()">
+                    הוסף
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM296 408L296 344L232 344C218.7 344 208 333.3 208 320C208 306.7 218.7 296 232 296L296 296L296 232C296 218.7 306.7 208 320 208C333.3 208 344 218.7 344 232L344 296L408 296C421.3 296 432 306.7 432 320C432 333.3 421.3 344 408 344L344 344L344 408C344 421.3 333.3 432 320 432C306.7 432 296 421.3 296 408z"/></svg>
+                </button>
             </div>
             
             <div id="draft-loading" class="hidden loader" style="margin-top: 0; margin-bottom: 1rem; font-size: 1rem;">מייבא נתונים מוויקיפדיה...</div>
-                        
+                         
             <button id="generate-link-btn" class="hidden" style="margin-top: 1rem;">שמור משחק ושתף קישור</button>
             
             <div id="link-result-area" class="hidden" style="margin-top: 1rem;">
