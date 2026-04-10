@@ -14,7 +14,8 @@
             --bg-color: #022c22;
             --text-color: #ecfeff;
             --title-color: #fbbf24;
-            --subtitle-color: #34d399;
+            --subtitle-color: #fef3c7;
+            /* --subtitle-color: #34d399; */
             --accent-color: #10b981;
             --accent-hover: #059669; 
             --category-bg: #064e3b;
@@ -52,12 +53,43 @@
             max-width: 600px;
         }
 
+        .title-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Align vertically to the center */
+            align-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
+            color: var(--title-color);
+        }
+
         h1 {
             font-family: 'Frank Ruhl Libre', serif;
             text-align: center;
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            margin: 0rem;
+        }
+
+        .help-btn {
+            background: none;
+            border: none;
+            color: var(--subtitle-color);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s, transform 0.2s;
+            width: auto;
+            margin: 0;
+            height: 1.75rem;
+            width: 1.75rem;
+        }
+
+        .help-btn:hover {
             color: var(--title-color);
+            transform: scale(1.1);
+            background: none; /* Override default button hover */
         }
 
         .subtitle {
@@ -359,12 +391,101 @@
         .alias-remove:hover {
             color: #ef4444;
         }
+
+        /* --- Modal about window --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+
+        .modal-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: flex !important; /* Keep flex for transition, toggle opacity instead */
+        }
+
+        .modal-content {
+            background-color: var(--bg-color);
+            border: 2px solid var(--secondary-bg);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: right;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--title-color);
+            border-bottom: 1px solid var(--secondary-bg);
+            padding-bottom: 0.5rem;
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem; /* Left side for RTL */
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.7;
+            padding: 0;
+            width: auto;
+            line-height: 1;
+        }
+
+        .close-modal-btn:hover {
+            opacity: 1;
+            background: none;
+            color: var(--error-color);
+        }
+        /* ------------------------ */
     </style>
 </head>
 <body>
 
+    <div id="instructions-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="close-modal-btn" id="close-modal-btn" title="סגור">&times;</button>
+            <h2>איך משחקים?</h2>
+            <p><strong>נחשו את הערך בוויקיפדיה לפי הקטגוריות שהוא משתייך אליהן.</strong></p>
+                
+                <p>ברשימה היומית יופיעו 10 <strong>אנשים, מקומות או דברים</strong>, מפורסמים יותר או פחות, שתצטרכו לנחש.</p>
+                
+                <p>זה <strong>מבחן ידע כללי</strong> שנותן הזדמנות ללמוד דברים חדשים!</p>
+                
+                <ul>
+                    <li>נחשו את <strong>הכותרת של העמוד.</strong> האיות לא חייב להיות מדויק.</li>
+                    <li>בסיום כל משחק תוכלו <strong>להשוות את עצמכם לשחקנים אחרים</strong>.</li>
+                    <li>אם אהבתם, אתם יכולים למצוא <strong>עוד רשימות בארכיון</strong>.</li>
+                </ul>
+            <p style="text-align: center; margin-top: 1.5rem; font-weight: bold; color: var(--accent-color);">
+                בהצלחה!
+            </p>
+        </div>
+    </div>
+
     <div class="container" id="app">
-        <h1><a href="/">חתול בשק</a></h1>
+        <div class="title-wrapper">
+            <h1><a href="/">חתול בשק</a></h1>
+            <button id="open-help-btn" class="help-btn" title="איך משחקים?">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z"/></svg>
+            </button>
+        </div>
         <div class="subtitle" id="main-subtitle">נחש את הערך בוויקיפדיה לפי הקטגוריות</div>
 
         <div id="loading" class="loader">
@@ -477,6 +598,37 @@
         let articleScores = []; // Tracks score per article (0, 0.5, or 1)
         
         let isCustomGame = false;
+
+        // About / help modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('instructions-modal');
+            const openBtn = document.getElementById('open-help-btn');
+            const closeBtn = document.getElementById('close-modal-btn');
+
+            // Open Modal
+            openBtn.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+            });
+
+            // Close Modal via X button
+            closeBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            // Close Modal via clicking outside the content box
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+            
+            // Close Modal via Escape key
+            window.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                }
+            });
+        });
 
         // DOM Elements
         const elLoading = document.getElementById('loading');
