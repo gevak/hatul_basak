@@ -23,7 +23,13 @@
             --link-color: #fbbf24;
         }
 
-        a { color: var(--link-color); }
+        a { 
+            color: var(--link-color); 
+            text-decoration: none; /* Changed from underline */
+        }
+        a:hover {
+            text-decoration: underline; /* Underline on hover */
+        }
 
         body {
             background-color: var(--bg-color);
@@ -358,7 +364,7 @@
 <body>
 
     <div class="container" id="app">
-        <h1>חתול בשק</h1>
+        <h1><a href="/">חתול בשק</a></h1>
         <div class="subtitle" id="main-subtitle">נחש את הערך בוויקיפדיה לפי הקטגוריות</div>
 
         <div id="loading" class="loader">
@@ -770,6 +776,7 @@
             draftArticles.push(articleData);
             inputEl.value = '';
             autoToggleOffCategories(draftArticles.length - 1); // Automatically toggle off categories based on title
+            autoAddAliases(draftArticles.length - 1); // Automatically add alternative names based on title
             renderDraftArticles();
         }
 
@@ -868,6 +875,22 @@
                 }
             }
             renderDraftArticles();
+        }
+
+        function autoAddAliases(articleIdx) {
+            const article = draftArticles[articleIdx];
+            const title = article.title;
+            const aliasesToAdd = [];
+
+            // If title contains parentheses, add the part before parentheses as an alias
+            if (title.includes('(')) {
+                const beforeParen = title.split('(')[0].trim();
+                if (beforeParen && !article.aliases.includes(beforeParen)) {
+                    aliasesToAdd.push(beforeParen);
+                }
+            }
+
+            article.aliases.push(...aliasesToAdd);
         }
 
         function toggleCategory(articleIdx, categoryName) {
