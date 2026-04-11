@@ -516,7 +516,7 @@
             <div id="guessing-state">
                 <div class="categories" id="categories-container"></div>
                 
-                <form class="embedded-form" onsubmit="event.preventDefault(); document.getElementById('guess-btn').click();">
+                <form id="guess-form" class="embedded-form">
                     <input type="text" id="guess-input" placeholder="שם הערך..." autocomplete="off" />
                     <button type="submit" id="guess-btn" title="נחש [Enter]">
                         נחש
@@ -649,7 +649,7 @@
         const elGameArea = document.getElementById('game-area');
         const elCategories = document.getElementById('categories-container');
         const elInput = document.getElementById('guess-input');
-        const elGuessBtn = document.getElementById('guess-btn');
+        const elGuessForm = document.getElementById('guess-form');
         const elGuessingState = document.getElementById('guessing-state');
         const elResultState = document.getElementById('result-state');
         const elResultTitle = document.getElementById('result-title');
@@ -767,7 +767,8 @@
             
             elCorrectAnswer.textContent = currentPage.title;
             elCorrectExtract.textContent = currentPage.extract || "לא נמצא תקציר לערך זה.";
-            
+            elNextBtn.focus();
+
             if (currentPage.image) {
             elCorrectImage.src = currentPage.image;
             elCorrectImage.style.display = 'block'; // Changed from inline-block to block
@@ -1137,8 +1138,12 @@
         }
 
         // Event Listeners
-        elGuessBtn.addEventListener('click', checkGuess);
-        elInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkGuess(); });
+        elGuessForm.addEventListener('submit', function(event) {
+            // Stop the form from refreshing the page
+            event.preventDefault(); 
+            checkGuess(); 
+        });
+
         elNextBtn.addEventListener('click', nextRound);
         elRetroBtn.addEventListener('click', claimRetroPoints);
         
