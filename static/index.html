@@ -696,6 +696,7 @@
 
             <div id="archive-loading" class="loader">טוען ארכיון...</div>
             <div id="archive-content" class="hidden">
+                <input type="text" id="archive-search-input" placeholder="חיפוש לפי כותרת..." autocomplete="off" onkeyup="renderArchive()" style="margin-bottom: 1rem; background-color: rgba(255, 255, 255, 0.1); border: 2px solid var(--secondary-bg); padding: 0.8rem; border-radius: 0.5rem; color: white; width: 100%; box-sizing: border-box; font-family: 'Assistant', sans-serif;" />
                 <table class="archive-table">
                     <thead>
                         <tr>
@@ -1263,9 +1264,11 @@
             document.getElementById('archive-state').classList.remove('hidden');
             document.getElementById('archive-loading').classList.remove('hidden');
             document.getElementById('archive-content').classList.add('hidden');
-
-            try {
-                const res = await fetch(`${API_BASE}/puzzles/archive`);
+            
+            const searchInput = document.getElementById('archive-search-input');
+            if (searchInput) searchInput.value = '';
+            
+            try {   const res = await fetch(`${API_BASE}/puzzles/archive`);
                 if (!res.ok) throw new Error("Failed to load archive");
                 allArchiveData = await res.json();
                 renderArchive();
@@ -1301,6 +1304,16 @@
             tbody.innerHTML = '';
 
             let filtered = allArchiveData.filter(p => currentArchiveTab === 'daily' ? p.is_daily : !p.is_daily);
+
+            const searchInput = document.getElementById('archive-search-input');
+            const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+            if (searchTerm) {
+                filtered = filtered.filter(p => {
+                    const t = p.title || '';
+                    return t.toLowerCase().includes(searchTerm);
+                });
+            }
 
             filtered.sort((a, b) => {
                 let valA = a[archiveSort.col];
