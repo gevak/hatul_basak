@@ -468,6 +468,80 @@
             color: var(--error-color);
         }
         /* ------------------------ */
+
+        /* --- Archive Styles --- */
+        #archive-state {
+            margin-top: 1rem;
+        }
+        .archive-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--secondary-bg);
+            padding-bottom: 0.5rem;
+        }
+        .archive-tab {
+            background: none;
+            border: none;
+            color: var(--subtitle-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            width: auto;
+            margin: 0;
+            opacity: 0.6;
+        }
+        .archive-tab.active {
+            color: var(--title-color);
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+        }
+        .archive-tab:hover:not(.active) {
+            color: var(--text-color);
+            background-color: rgba(255, 255, 255, 0.05);
+            opacity: 1;
+        }
+        
+        .archive-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .archive-table th {
+            background-color: var(--secondary-bg);
+            color: var(--title-color);
+            padding: 1rem;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .archive-table th:hover {
+            background-color: #134e4a;
+        }
+        .archive-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .archive-table tr:last-child td {
+            border-bottom: none;
+        }
+        .archive-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+        .archive-table a {
+            display: flex;
+            align-items: center;
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -498,6 +572,9 @@
             <h1><a href="/">חתול בשק</a></h1>
             <button id="open-help-btn" class="help-btn" title="איך משחקים?">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z"/></svg>
+            </button>
+            <button id="open-archive-btn" class="help-btn" title="ארכיון" style="margin-right: 0.5rem;" onclick="showArchive()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M32 32H480c17.7 0 32 14.3 32 32V96c0 17.7-14.3 32-32 32H32C14.3 128 0 113.7 0 96V64C0 46.3 14.3 32 32 32zm0 128H480V416c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V160zm128 80c0 8.8 7.2 16 16 16H336c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z"/></svg>
             </button>
         </div>
         <div class="subtitle" id="main-subtitle">נחש את הערך בויקיפדיה לפי הקטגוריות</div>
@@ -564,11 +641,41 @@
             <button id="show-creator-btn-end" class="secondary">צור משחק משלך</button>
         </div>
 
+        <div id="archive-state" class="hidden">
+            <h2>ארכיון חידות</h2>
+            <div class="archive-tabs">
+                <button id="tab-daily" class="archive-tab active" onclick="switchArchiveTab('daily')">חידות יומיות</button>
+                <button id="tab-community" class="archive-tab" onclick="switchArchiveTab('community')">חידות קהילה</button>
+            </div>
+            
+            <div id="archive-loading" class="loader">טוען ארכיון...</div>
+            <div id="archive-content" class="hidden">
+                <table class="archive-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortArchive('created_at')">תאריך ↕</th>
+                            <th onclick="sortArchive('title')">כותרת ↕</th>
+                            <th onclick="sortArchive('solves')">מספר פותרים ↕</th>
+                            <th onclick="sortArchive('median_score')">קושי (חציון) ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archive-tbody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <button onclick="location.reload()" class="secondary" style="margin-top: 2rem;">חזור למשחק</button>
+        </div>
+
         <div id="creator-state" class="hidden">
             <h2>יצירת משחק מותאם אישית</h2>
             <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1rem;">
                 הוסף קישורים לערכים בויקיפדיה העברית (או שמות ערכים). תוכל לערוך את הקטגוריות ולהוסיף כינויים חלופיים לפני השמירה.
             </p>
+
+            <div style="margin-bottom: 1.5rem;">
+                <input type="text" id="manual-title-input" placeholder="כותרת החידה (לא חובה)" autocomplete="off" />
+            </div>
 
             <div id="draft-articles-container"></div>
 
@@ -1090,6 +1197,94 @@
             renderDraftArticles();
         }
 
+        // --- Archive Logic ---
+        let allArchiveData = [];
+        let currentArchiveTab = 'daily';
+        let archiveSort = { col: 'created_at', asc: false };
+
+        async function showArchive() {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('game-area').classList.add('hidden');
+            document.getElementById('end-state').classList.add('hidden');
+            document.getElementById('creator-state').classList.add('hidden');
+            document.getElementById('archive-state').classList.remove('hidden');
+            document.getElementById('archive-loading').classList.remove('hidden');
+            document.getElementById('archive-content').classList.add('hidden');
+            
+            try {
+                const res = await fetch(`${API_BASE}/puzzles/archive`);
+                if (!res.ok) throw new Error("Failed to load archive");
+                allArchiveData = await res.json();
+                renderArchive();
+            } catch(e) {
+                console.error(e);
+                document.getElementById('archive-loading').textContent = "שגיאה בטעינת הארכיון.";
+            }
+        }
+
+        function switchArchiveTab(tab) {
+            currentArchiveTab = tab;
+            document.getElementById('tab-daily').classList.toggle('active', tab === 'daily');
+            document.getElementById('tab-community').classList.toggle('active', tab === 'community');
+            archiveSort = { col: 'created_at', asc: false };
+            renderArchive();
+        }
+
+        function sortArchive(col) {
+            if (archiveSort.col === col) {
+                archiveSort.asc = !archiveSort.asc;
+            } else {
+                archiveSort.col = col;
+                archiveSort.asc = col === 'created_at' ? false : true;
+            }
+            renderArchive();
+        }
+
+        function renderArchive() {
+            document.getElementById('archive-loading').classList.add('hidden');
+            document.getElementById('archive-content').classList.remove('hidden');
+            
+            const tbody = document.getElementById('archive-tbody');
+            tbody.innerHTML = '';
+            
+            let filtered = allArchiveData.filter(p => currentArchiveTab === 'daily' ? p.is_daily : !p.is_daily);
+            
+            filtered.sort((a, b) => {
+                let valA = a[archiveSort.col];
+                let valB = b[archiveSort.col];
+                
+                if (valA === null || valA === undefined) valA = '';
+                if (valB === null || valB === undefined) valB = '';
+                
+                if (typeof valA === 'string') {
+                    return archiveSort.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+                return archiveSort.asc ? (valA > valB ? 1 : -1) : (valB > valA ? 1 : -1);
+            });
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">אין נתונים להצגה</td></tr>`;
+                return;
+            }
+            
+            filtered.forEach(p => {
+                const tr = document.createElement('tr');
+                const dateStr = p.created_at ? new Date(p.created_at).toLocaleDateString('he-IL') : '-';
+                const link = `/?id=${p.id}`;
+                
+                const scoreDisplay = p.median_score != null ? `${p.median_score.toFixed(1)} / 10` : '-';
+                
+                tr.innerHTML = `
+                    <td><a href="${link}">${dateStr}</a></td>
+                    <td><a href="${link}">${p.title || 'ללא כותרת'}</a></td>
+                    <td><a href="${link}">${p.solves}</a></td>
+                    <td dir="ltr" style="text-align: right;"><a href="${link}">${scoreDisplay}</a></td>
+                `;
+                tr.onclick = () => window.location.href = link;
+                tbody.appendChild(tr);
+            });
+        }
+
         // Rewritten Submit Function
         async function createGameLink() {
             if (draftArticles.length === 0) return;
@@ -1107,12 +1302,20 @@
                 extract: article.extract,
                 categories: article.activeCategories
             }));
+            
+            const titleInput = document.getElementById('manual-title-input');
+            const titleVal = titleInput ? titleInput.value.trim() : "";
+
+            const payloadBody = { data: payload };
+            if (titleVal) {
+                payloadBody.title = titleVal;
+            }
 
             try {
                 const response = await fetch(`${API_BASE}/puzzles/manual`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: payload }) // Sending the fully prepared payload
+                    body: JSON.stringify(payloadBody)
                 });
                 
                 if (!response.ok) throw new Error("Failed to save puzzle");

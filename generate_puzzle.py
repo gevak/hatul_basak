@@ -10,6 +10,7 @@ from supabase import create_client, Client
 from typing import List
 from dotenv import load_dotenv
 import requests
+import datetime
 
 from wiki_utils import get_wikipedia_pages, select_pages_subset
 
@@ -31,6 +32,7 @@ def create_new_puzzle():
     # Save to Supabase
     new_puzzle = {
         "is_daily": True,
+        "title": f"חידה יומית - {datetime.date.today().strftime('%d/%m/%Y')}",
         "data": ai_picks
     }
     result = supabase.table("puzzles").insert(new_puzzle).execute()

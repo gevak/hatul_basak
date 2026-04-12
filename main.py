@@ -13,6 +13,7 @@ from pydantic import BaseModel
 from supabase import create_client, Client
 from typing import List, Optional
 from dotenv import load_dotenv
+import statistics
 
 load_dotenv()
 
@@ -49,6 +50,54 @@ async def get_daily_puzzle():
         raise HTTPException(status_code=404, detail="No daily puzzle found")
     return response.data[0]
 
+@app.get("/api/puzzles/archive")
+async def get_archive():
+    """Returns all puzzles with their stats for the archive page."""
+    # Fetch all puzzles
+    puzzles_res = supabase.table("puzzles").select("id, created_at, is_daily, title").order("created_at", desc=True).execute()
+    puzzles = puzzles_res.data
+    
+    # Fetch all submissions to calculate stats
+    subs_res = supabase.table("submissions").select("puzzle_id, total_score").execute()
+    subs = subs_res.data
+    
+    # Process submissions
+    puzzle_stats = {}
+    for sub in subs:
+        pid = sub["puzzle_id"]
+        if pid not in puzzle_stats:
+            puzzle_stats[pid] = {"scores": [], "solves": 0}
+        puzzle_stats[pid]["scores"].append(sub["total_score"])
+        puzzle_stats[pid]["solves"] += 1
+        
+    archive_data = []
+    for p in puzzles:
+        pid = p["id"]
+        stats = puzzle_stats.get(pid, {"scores": [], "solves": 0})
+        
+        median_score = None
+        if stats["scores"]:
+            median_score = statistics.median(stats["scores"])
+            
+        title = p.get("title")
+        if not title:
+            created = p.get("created_at", "")[:10] if p.get("created_at") else ""
+            if p.get("is_daily"):
+                title = f"חידה יומית - {created}" if created else "חידה יומית"
+            else:
+                title = f"חידת קהילה - {created}" if created else "חידת קהילה"
+                
+        archive_data.append({
+            "id": pid,
+            "title": title,
+            "created_at": p.get("created_at"),
+            "is_daily": p.get("is_daily", False),
+            "solves": stats["solves"],
+            "median_score": median_score
+        })
+        
+    return archive_data
+
 @app.get("/api/puzzles/{puzzle_id}")
 async def get_puzzle(puzzle_id: str):
     """Returns a specific puzzle by ID (for archives or manual games)."""
@@ -67,11 +116,12 @@ class ArticleItem(BaseModel):
     categories: List[str] = []
 
 # The payload wrapping the list of articles
-class ManualPuzzleRequest(BaseModel):
+class ManualPuzzleRequestPayload(BaseModel):
+    title: Optional[str] = None
     data: List[ArticleItem]
 
 @app.post("/api/puzzles/manual")
-async def create_manual_puzzle(req: ManualPuzzleRequest):
+async def create_manual_puzzle(req: ManualPuzzleRequestPayload):
     """Saves a fully assembled puzzle directly from the frontend."""
     
     if not req.data or len(req.data) > 20:
@@ -82,6 +132,8 @@ async def create_manual_puzzle(req: ManualPuzzleRequest):
         "is_daily": False,
         "data": [item.model_dump() for item in req.data]
     }
+    if req.title:
+        new_puzzle["title"] = req.title
     
     try:
         result = supabase.table("puzzles").insert(new_puzzle).execute()
