@@ -1,12 +1,14 @@
 <!doctype html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="utf-8" />
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://hatulbasak.geekip.dev/">
     <meta property="og:title" content="חתול בשק: משחק הניחושים של ויקיפדיה">
-    <meta property="og:description" content="חושבים שאתם מכירים הכל? נחשו את העמוד בויקיפדיה לפי הקטגוריות שלו. 10 אתגרים חדשים בכל יום על אנשים, מקומות ודברים.">
+    <meta property="og:description"
+        content="חושבים שאתם מכירים הכל? נחשו את העמוד בויקיפדיה לפי הקטגוריות שלו. 10 אתגרים חדשים בכל יום על אנשים, מקומות ודברים.">
     <meta property="og:image" content="https://hatulbasak.geekip.dev/static/preview-image.png">
 
     <!-- Twitter -->
@@ -15,13 +17,15 @@
     <meta property="twitter:description" content="מבחן ידע כללי יומי: מצליחים לנחש איזה ערך מסתתר מאחורי הקטגוריות?">
     <meta property="twitter:image" content="https://hatulbasak.geekip.dev/static/preview-image.png">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
+
     <title>חתול בשק - משחק הניחושים של ויקיפדיה</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600&family=Frank+Ruhl+Libre:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600&family=Frank+Ruhl+Libre:wght@700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -31,19 +35,22 @@
             --subtitle-color: #fef3c7;
             /* --subtitle-color: #34d399; */
             --accent-color: #10b981;
-            --accent-hover: #059669; 
+            --accent-hover: #059669;
             --category-bg: #064e3b;
             --secondary-bg: #115e59;
             --error-color: #ef4444;
             --link-color: #fbbf24;
         }
 
-        a { 
-            color: var(--link-color); 
-            text-decoration: none; /* Changed from underline */
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            /* Changed from underline */
         }
+
         a:hover {
-            text-decoration: underline; /* Underline on hover */
+            text-decoration: underline;
+            /* Underline on hover */
         }
 
         body {
@@ -103,7 +110,8 @@
         .help-btn:hover {
             color: var(--title-color);
             transform: scale(1.1);
-            background: none; /* Override default button hover */
+            background: none;
+            /* Override default button hover */
         }
 
         .subtitle {
@@ -138,7 +146,8 @@
         }
 
         /* Standard Inputs */
-        input[type="text"], textarea {
+        input[type="text"],
+        textarea {
             width: 100%;
             padding: 1rem;
             font-size: 1.1rem;
@@ -151,7 +160,8 @@
             font-family: 'Assistant', sans-serif;
         }
 
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--accent-color);
         }
@@ -183,7 +193,7 @@
 
         /* Override focus inside the embedded form so the wrapper takes over */
         .embedded-form input[type="text"]:focus {
-            border-color: transparent; 
+            border-color: transparent;
         }
 
         .embedded-form button {
@@ -195,8 +205,10 @@
             justify-content: center;
             gap: 0.5rem;
             padding: 0 1.5rem;
-            border-right: 2px solid var(--bg-color); /* Separator line between input and button */
+            border-right: 2px solid var(--bg-color);
+            /* Separator line between input and button */
         }
+
         /* -------------------------------- */
 
         button {
@@ -237,7 +249,9 @@
             margin-right: auto;
         }
 
-        .hidden { display: none !important; }
+        .hidden {
+            display: none !important;
+        }
 
         .result-box {
             background-color: rgba(0, 0, 0, 0.2);
@@ -246,7 +260,7 @@
             margin-bottom: 1.5rem;
             text-align: center;
         }
-        
+
         .extract-text {
             font-size: 0.95rem;
             line-height: 1.5;
@@ -276,7 +290,7 @@
             flex-shrink: 0;
             border-radius: 0.5rem;
             object-fit: cover;
-            background-color: rgba(255,255,255,0.05);
+            background-color: rgba(255, 255, 255, 0.05);
             display: none;
         }
 
@@ -285,6 +299,7 @@
                 flex-direction: column-reverse;
                 align-items: center;
             }
+
             .result-image {
                 width: 100%;
                 height: 200px;
@@ -299,13 +314,13 @@
         }
 
         #creator-state {
-            background-color: rgba(0,0,0,0.15);
+            background-color: rgba(0, 0, 0, 0.15);
             padding: 1.5rem;
             border-radius: 0.5rem;
         }
 
         .stats-container {
-            background: rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.2);
             padding: 1.5rem;
             border-radius: 0.5rem;
             margin-bottom: 1.5rem;
@@ -316,7 +331,7 @@
             justify-content: space-between;
             margin-bottom: 0.5rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stat-bar-container {
@@ -425,7 +440,8 @@
         .modal-overlay.hidden {
             opacity: 0;
             pointer-events: none;
-            display: flex !important; /* Keep flex for transition, toggle opacity instead */
+            display: flex !important;
+            /* Keep flex for transition, toggle opacity instead */
         }
 
         .modal-content {
@@ -436,7 +452,7 @@
             max-width: 450px;
             width: 90%;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             text-align: right;
         }
 
@@ -450,7 +466,8 @@
         .close-modal-btn {
             position: absolute;
             top: 1rem;
-            left: 1rem; /* Left side for RTL */
+            left: 1rem;
+            /* Left side for RTL */
             background: none;
             border: none;
             color: var(--text-color);
@@ -467,12 +484,14 @@
             background: none;
             color: var(--error-color);
         }
+
         /* ------------------------ */
 
         /* --- Archive Styles --- */
         #archive-state {
             margin-top: 1rem;
         }
+
         .archive-tabs {
             display: flex;
             gap: 1rem;
@@ -480,6 +499,7 @@
             border-bottom: 2px solid var(--secondary-bg);
             padding-bottom: 0.5rem;
         }
+
         .archive-tab {
             background: none;
             border: none;
@@ -493,17 +513,19 @@
             margin: 0;
             opacity: 0.6;
         }
+
         .archive-tab.active {
             color: var(--title-color);
             background-color: rgba(255, 255, 255, 0.1);
             opacity: 1;
         }
+
         .archive-tab:hover:not(.active) {
             color: var(--text-color);
             background-color: rgba(255, 255, 255, 0.05);
             opacity: 1;
         }
-        
+
         .archive-table {
             width: 100%;
             border-collapse: collapse;
@@ -512,6 +534,7 @@
             border-radius: 0.5rem;
             overflow: hidden;
         }
+
         .archive-table th {
             background-color: var(--secondary-bg);
             color: var(--title-color);
@@ -520,20 +543,25 @@
             user-select: none;
             white-space: nowrap;
         }
+
         .archive-table th:hover {
             background-color: #134e4a;
         }
+
         .archive-table td {
             padding: 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
+
         .archive-table tr:last-child td {
             border-bottom: none;
         }
+
         .archive-table tr:hover {
             background-color: rgba(255, 255, 255, 0.05);
             cursor: pointer;
         }
+
         .archive-table a {
             display: flex;
             align-items: center;
@@ -544,6 +572,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div id="instructions-modal" class="modal-overlay hidden">
@@ -551,16 +580,16 @@
             <button class="close-modal-btn" id="close-modal-btn" title="סגור">&times;</button>
             <h2>איך משחקים?</h2>
             <p><strong>נחשו את הערך בויקיפדיה לפי הקטגוריות שהוא משתייך אליהן.</strong></p>
-                
-                <p>ברשימה היומית יופיעו 10 <strong>אנשים, מקומות או דברים</strong>, מפורסמים יותר או פחות, שתצטרכו לנחש.</p>
-                
-                <p>זה <strong>מבחן ידע כללי</strong> שנותן הזדמנות ללמוד דברים חדשים!</p>
-                
-                <ul>
-                    <li>נחשו את <strong>הכותרת של העמוד.</strong> האיות לא חייב להיות מדויק.</li>
-                    <li>בסיום כל משחק תוכלו <strong>להשוות את עצמכם לשחקנים אחרים</strong>.</li>
-                    <li>אם אהבתם, אתם יכולים למצוא <strong>עוד רשימות בארכיון</strong>.</li>
-                </ul>
+
+            <p>ברשימה היומית יופיעו 10 <strong>אנשים, מקומות או דברים</strong>, מפורסמים יותר או פחות, שתצטרכו לנחש.</p>
+
+            <p>זה <strong>מבחן ידע כללי</strong> שנותן הזדמנות ללמוד דברים חדשים!</p>
+
+            <ul>
+                <li>נחשו את <strong>הכותרת של העמוד.</strong> האיות לא חייב להיות מדויק.</li>
+                <li>בסיום כל משחק תוכלו <strong>להשוות את עצמכם לשחקנים אחרים</strong>.</li>
+                <li>אם אהבתם, אתם יכולים למצוא <strong>עוד רשימות בארכיון</strong>.</li>
+            </ul>
             <p style="text-align: center; margin-top: 1.5rem; font-weight: bold; color: var(--accent-color);">
                 בהצלחה!
             </p>
@@ -571,10 +600,19 @@
         <div class="title-wrapper">
             <h1><a href="/">חתול בשק</a></h1>
             <button id="open-help-btn" class="help-btn" title="איך משחקים?">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+                    <path
+                        d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM320 240C302.3 240 288 254.3 288 272C288 285.3 277.3 296 264 296C250.7 296 240 285.3 240 272C240 227.8 275.8 192 320 192C364.2 192 400 227.8 400 272C400 319.2 364 339.2 344 346.5L344 350.3C344 363.6 333.3 374.3 320 374.3C306.7 374.3 296 363.6 296 350.3L296 342.2C296 321.7 310.8 307 326.1 302C332.5 299.9 339.3 296.5 344.3 291.7C348.6 287.5 352 281.7 352 272.1C352 254.4 337.7 240.1 320 240.1zM288 432C288 414.3 302.3 400 320 400C337.7 400 352 414.3 352 432C352 449.7 337.7 464 320 464C302.3 464 288 449.7 288 432z" />
+                </svg>
             </button>
-            <button id="open-archive-btn" class="help-btn" title="ארכיון" style="margin-right: 0.5rem;" onclick="showArchive()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M32 32H480c17.7 0 32 14.3 32 32V96c0 17.7-14.3 32-32 32H32C14.3 128 0 113.7 0 96V64C0 46.3 14.3 32 32 32zm0 128H480V416c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V160zm128 80c0 8.8 7.2 16 16 16H336c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z"/></svg>
+            <button id="open-archive-btn" class="help-btn" title="ארכיון" style="margin-right: 0.5rem;"
+                onclick="showArchive()">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+                    <path
+                        d="M32 32H480c17.7 0 32 14.3 32 32V96c0 17.7-14.3 32-32 32H32C14.3 128 0 113.7 0 96V64C0 46.3 14.3 32 32 32zm0 128H480V416c0 35.3-28.7 64-64 64H96c-35.3 0-64-28.7-64-64V160zm128 80c0 8.8 7.2 16 16 16H336c8.8 0 16-7.2 16-16s-7.2-16-16-16H176c-8.8 0-16 7.2-16 16z" />
+                </svg>
             </button>
         </div>
         <div class="subtitle" id="main-subtitle">נחש את הערך בויקיפדיה לפי הקטגוריות</div>
@@ -592,12 +630,17 @@
 
             <div id="guessing-state">
                 <div class="categories" id="categories-container"></div>
-                
+
                 <form id="guess-form" class="embedded-form">
                     <input type="text" id="guess-input" placeholder="שם הערך..." autocomplete="off" />
                     <button type="submit" id="guess-btn" title="נחש [Enter]">
                         נחש
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.<path d="M320 576C178.6 576 64 461.4 64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576zM438 209.7C427.3 201.9 412.3 204.3 404.5 215L285.1 379.2L233 327.1C223.6 317.7 208.4 317.7 199.1 327.1C189.8 336.5 189.7 351.7 199.1 361L271.1 433C276.1 438 282.9 440.5 289.9 440C296.9 439.5 303.3 435.9 307.4 430.2L443.3 243.2C451.1 232.5 448.7 217.5 438 209.7z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">!Font Awesome Free v7.2.0 by
+                            @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free
+                            Copyright 2026 Fonticons, Inc.
+                            <path
+                                d="M320 576C178.6 576 64 461.4 64 320C64 178.6 178.6 64 320 64C461.4 64 576 178.6 576 320C576 461.4 461.4 576 320 576zM438 209.7C427.3 201.9 412.3 204.3 404.5 215L285.1 379.2L233 327.1C223.6 317.7 208.4 317.7 199.1 327.1C189.8 336.5 189.7 351.7 199.1 361L271.1 433C276.1 438 282.9 440.5 289.9 440C296.9 439.5 303.3 435.9 307.4 430.2L443.3 243.2C451.1 232.5 448.7 217.5 438 209.7z" />
+                        </svg>
                     </button>
                 </form>
             </div>
@@ -605,34 +648,35 @@
             <div id="result-state" class="hidden">
                 <div class="result-box">
                     <h2 id="result-title"></h2>
-                    
+
                     <div class="result-main-content">
-                        
+
                         <div class="result-info">
                             <p style="margin-top: 0;">התשובה הנכונה היא: <strong id="correct-answer"></strong></p>
                             <div id="correct-extract" class="extract-text"></div>
                         </div>
 
                         <img id="correct-image" class="result-image" alt="תמונת הערך" />
-                        
+
                     </div>
                 </div>
-                
+
                 <button id="next-btn">הבא</button>
                 <button id="retro-btn" class="secondary">בעצם ידעתי את זה! (+1)</button>
             </div>
-            
+
             <button id="show-creator-btn" class="secondary small">צור משחק משלך לשתף עם חברים</button>
         </div>
 
         <div id="end-state" class="hidden loader">
             <h2>המשחק נגמר!</h2>
             <p>הניקוד הסופי שלך: <strong id="final-score">0</strong> מתוך <span id="final-total">10</span></p>
-            
+
             <div id="stats-loading">מחשב נתונים בהשוואה לשחקנים אחרים...</div>
-            
+
             <div id="stats-area" class="hidden stats-container">
-                <p>אתה באחוזון ה- <strong id="stat-percentile" style="color: var(--accent-color); font-size: 1.2rem;"></strong>!</p>
+                <p>אתה באחוזון ה- <strong id="stat-percentile"
+                        style="color: var(--accent-color); font-size: 1.2rem;"></strong>!</p>
                 <h3 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">אחוזי הצלחה לפי ערך:</h3>
                 <div id="article-stats"></div>
             </div>
@@ -644,10 +688,12 @@
         <div id="archive-state" class="hidden">
             <h2>ארכיון חידות</h2>
             <div class="archive-tabs">
-                <button id="tab-daily" class="archive-tab active" onclick="switchArchiveTab('daily')">חידות יומיות</button>
-                <button id="tab-community" class="archive-tab" onclick="switchArchiveTab('community')">חידות קהילה</button>
+                <button id="tab-daily" class="archive-tab active" onclick="switchArchiveTab('daily')">חידות
+                    יומיות</button>
+                <button id="tab-community" class="archive-tab" onclick="switchArchiveTab('community')">חידות
+                    קהילה</button>
             </div>
-            
+
             <div id="archive-loading" class="loader">טוען ארכיון...</div>
             <div id="archive-content" class="hidden">
                 <table class="archive-table">
@@ -656,21 +702,22 @@
                             <th onclick="sortArchive('created_at')">תאריך ↕</th>
                             <th onclick="sortArchive('title')">כותרת ↕</th>
                             <th onclick="sortArchive('solves')">מספר פותרים ↕</th>
-                            <th onclick="sortArchive('median_score')">קושי (חציון) ↕</th>
+                            <th onclick="sortArchive('median_score')">ציון חציוני ↕</th>
                         </tr>
                     </thead>
                     <tbody id="archive-tbody">
                     </tbody>
                 </table>
             </div>
-            
+
             <button onclick="location.reload()" class="secondary" style="margin-top: 2rem;">חזור למשחק</button>
         </div>
 
         <div id="creator-state" class="hidden">
             <h2>יצירת משחק מותאם אישית</h2>
             <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1rem;">
-                הוסף קישורים לערכים בויקיפדיה העברית (או שמות ערכים). תוכל לערוך את הקטגוריות ולהוסיף כינויים חלופיים לפני השמירה.
+                הוסף קישורים לערכים בויקיפדיה העברית (או שמות ערכים). תוכל לערוך את הקטגוריות ולהוסיף כינויים חלופיים
+                לפני השמירה.
             </p>
 
             <div style="margin-bottom: 1.5rem;">
@@ -680,17 +727,23 @@
             <div id="draft-articles-container"></div>
 
             <div class="embedded-form" style="margin-bottom: 1.5rem;">
-                <input type="text" id="new-article-input" placeholder="https://he.wikipedia.org/wiki/... או שם ערך" autocomplete="off" onkeypress="if(event.key === 'Enter') addArticleFromInput()" />
+                <input type="text" id="new-article-input" placeholder="https://he.wikipedia.org/wiki/... או שם ערך"
+                    autocomplete="off" onkeypress="if(event.key === 'Enter') addArticleFromInput()" />
                 <button id="add-article-btn" onclick="addArticleFromInput()">
                     הוסף
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM296 408L296 344L232 344C218.7 344 208 333.3 208 320C208 306.7 218.7 296 232 296L296 296L296 232C296 218.7 306.7 208 320 208C333.3 208 344 218.7 344 232L344 296L408 296C421.3 296 432 306.7 432 320C432 333.3 421.3 344 408 344L344 344L344 408C344 421.3 333.3 432 320 432C306.7 432 296 421.3 296 408z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 640 640"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+                        <path
+                            d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 576zM296 408L296 344L232 344C218.7 344 208 333.3 208 320C208 306.7 218.7 296 232 296L296 296L296 232C296 218.7 306.7 208 320 208C333.3 208 344 218.7 344 232L344 296L408 296C421.3 296 432 306.7 432 320C432 333.3 421.3 344 408 344L344 344L344 408C344 421.3 333.3 432 320 432C306.7 432 296 421.3 296 408z" />
+                    </svg>
                 </button>
             </div>
-            
-            <div id="draft-loading" class="hidden loader" style="margin-top: 0; margin-bottom: 1rem; font-size: 1rem;">מייבא נתונים מויקיפדיה...</div>
-                         
+
+            <div id="draft-loading" class="hidden loader" style="margin-top: 0; margin-bottom: 1rem; font-size: 1rem;">
+                מייבא נתונים מויקיפדיה...</div>
+
             <button id="generate-link-btn" class="hidden" style="margin-top: 1rem;">שמור משחק ושתף קישור</button>
-            
+
             <div id="link-result-area" class="hidden" style="margin-top: 1rem;">
                 <p>הקישור שלך מוכן!</p>
                 <input type="text" id="generated-link" readonly onclick="this.select()" />
@@ -705,9 +758,9 @@
         // CONFIG
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-        const API_BASE = isLocalhost 
-        ? 'http://127.0.0.1:8000/api' 
-        : 'https://hatulbasak.geekip.dev/api';
+        const API_BASE = isLocalhost
+            ? 'http://127.0.0.1:8000/api'
+            : 'https://hatulbasak.geekip.dev/api';
 
         // Game State
         let puzzleId = null;
@@ -717,7 +770,7 @@
         let totalRounds = 10;
         let currentRetroAvailable = false;
         let articleScores = []; // Tracks score per article (0, 0.5, or 1)
-        
+
         let isCustomGame = false;
 
         // About / help modal
@@ -742,7 +795,7 @@
                     modal.classList.add('hidden');
                 }
             });
-            
+
             // Close Modal via Escape key
             window.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
@@ -771,7 +824,7 @@
         const elFinalScore = document.getElementById('final-score');
         const elTotalRoundsDisplay = document.getElementById('total-rounds-display');
         const elFinalTotal = document.getElementById('final-total');
-        
+
         // Creator DOM Elements
         const elCreatorState = document.getElementById('creator-state');
         const elShowCreatorBtns = [document.getElementById('show-creator-btn'), document.getElementById('show-creator-btn-end')];
@@ -781,7 +834,7 @@
         async function initGame() {
             const urlParams = new URLSearchParams(window.location.search);
             const explicitId = urlParams.get('id');
-            
+
             try {
                 let response;
                 if (explicitId) {
@@ -798,14 +851,14 @@
                 puzzleId = puzzleData.id;
                 pages = puzzleData.data;
                 totalRounds = pages.length;
-                
+
                 elTotalRoundsDisplay.textContent = totalRounds;
                 elFinalTotal.textContent = totalRounds;
-                
+
                 elLoading.classList.add('hidden');
                 elGameArea.classList.remove('hidden');
                 loadRound();
-                
+
             } catch (error) {
                 console.error(error);
                 elLoading.textContent = "שגיאה בטעינת החידה. ודא שהשרת פועל.";
@@ -817,10 +870,10 @@
             elResultState.classList.add('hidden');
             elInput.value = '';
             elInput.focus();
-            
+
             const currentPage = pages[currentRound];
             elRoundNum.textContent = currentRound + 1;
-            
+
             elCategories.innerHTML = '';
             if (currentPage.categories.length === 0) {
                 elCategories.innerHTML = '<span class="category" style="background-color: var(--error-color)">אין קטגוריות</span>';
@@ -854,34 +907,34 @@
         function checkGuess() {
             const guess = elInput.value.trim().toLowerCase();
             const currentPage = pages[currentRound];
-    
+
             // Combine the main title and aliases into one array for checking
             const validNames = [currentPage.title, ...(currentPage.aliases || [])];
 
             // Use .some() to see if any name in the list meets the tolerance
             const isCorrect = validNames.some(name => {
                 const actual = name.toLowerCase();
-                
+
                 // Dynamic tolerance based on the length of the specific alias being checked
                 const distance = levenshtein(guess, actual);
                 const tolerance = actual.length > 8 ? 3 : 2;
-                
+
                 return distance <= tolerance;
             });
 
             elGuessingState.classList.add('hidden');
             elResultState.classList.remove('hidden');
-            
+
             elCorrectAnswer.textContent = currentPage.title;
             elCorrectExtract.textContent = currentPage.extract || "לא נמצא תקציר לערך זה.";
             elNextBtn.focus();
 
             if (currentPage.image) {
-            elCorrectImage.src = currentPage.image;
-            elCorrectImage.style.display = 'block'; // Changed from inline-block to block
-        } else {
-            elCorrectImage.style.display = 'none';
-        }
+                elCorrectImage.src = currentPage.image;
+                elCorrectImage.style.display = 'block'; // Changed from inline-block to block
+            } else {
+                elCorrectImage.style.display = 'none';
+            }
 
             if (isCorrect) {
                 score += 1;
@@ -922,7 +975,7 @@
             elGameArea.classList.add('hidden');
             elEndState.classList.remove('hidden');
             elFinalScore.textContent = score;
-            
+
             try {
                 // Submit scores to backend
                 const response = await fetch(`${API_BASE}/submissions`, {
@@ -934,24 +987,24 @@
                         total_score: score
                     })
                 });
-                
+
                 const stats = await response.json();
                 document.getElementById('stats-loading').classList.add('hidden');
-                
+
                 if (stats.error) {
                     console.log("Stats unavailable");
                 } else {
                     document.getElementById('stats-area').classList.remove('hidden');
                     document.getElementById('stat-percentile').textContent = `${stats.percentile}%`;
-                    
+
                     const elArticleStats = document.getElementById('article-stats');
                     elArticleStats.innerHTML = '';
-                    
+
                     pages.forEach((page, idx) => {
                         const percent = stats.article_percentages[idx] || 0;
                         const userScore = articleScores[idx] || 0;
                         const indicator = userScore === 1 ? '✅' : (userScore === 0.5 ? '⚠️' : '❌');
-                        
+
                         elArticleStats.innerHTML += `
                             <div class="stat-item">
                                 <span style="font-size: 0.9rem;">${indicator} ${page.title}</span>
@@ -988,7 +1041,7 @@
                     const pathParts = url.pathname.split('/');
                     title = decodeURIComponent(pathParts[pathParts.length - 1]).replace(/_/g, ' ');
                 }
-            } catch(e) {}
+            } catch (e) { }
 
             // origin=* is critical to bypass CORS restrictions from the browser
             const url = `https://he.wikipedia.org/w/api.php?action=query&format=json&prop=extracts|categories|pageimages&titles=${encodeURIComponent(title)}&exintro=1&explaintext=1&cllimit=max&clshow=!hidden&exlimit=max&pithumbsize=500&origin=*`;
@@ -998,13 +1051,13 @@
                 const data = await response.json();
                 const pages = data.query.pages;
                 const pageId = Object.keys(pages)[0];
-                
+
                 if (pageId === "-1") return null;
 
                 const p = pages[pageId];
                 const rawCats = p.categories || [];
                 const cleanCats = rawCats.map(c => c.title.replace("קטגוריה:", "").trim());
-                
+
                 // Grab the first two lines of the extract
                 const extractLines = (p.extract || "").split('\n').filter(l => l.trim() !== "").slice(0, 2).join('\n');
 
@@ -1012,7 +1065,7 @@
                     title: p.title,
                     url: `https://he.wikipedia.org/wiki/${p.title.replace(/ /g, '_')}`,
                     extract: extractLines,
-                    categories: cleanCats, 
+                    categories: cleanCats,
                     activeCategories: [...cleanCats], // State to track which categories the user kept
                     image: p.thumbnail ? p.thumbnail.source : null,
                     aliases: []
@@ -1067,7 +1120,7 @@
             if (newlineIndex !== -1) {
                 cutoff = Math.min(cutoff, newlineIndex);
             }
-            
+
             if (dotSpaceIndex !== -1) {
                 // Include the dot (index + 1) but stop before the space
                 cutoff = Math.min(cutoff, dotSpaceIndex + 1);
@@ -1210,13 +1263,13 @@
             document.getElementById('archive-state').classList.remove('hidden');
             document.getElementById('archive-loading').classList.remove('hidden');
             document.getElementById('archive-content').classList.add('hidden');
-            
+
             try {
                 const res = await fetch(`${API_BASE}/puzzles/archive`);
                 if (!res.ok) throw new Error("Failed to load archive");
                 allArchiveData = await res.json();
                 renderArchive();
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 document.getElementById('archive-loading').textContent = "שגיאה בטעינת הארכיון.";
             }
@@ -1243,37 +1296,41 @@
         function renderArchive() {
             document.getElementById('archive-loading').classList.add('hidden');
             document.getElementById('archive-content').classList.remove('hidden');
-            
+
             const tbody = document.getElementById('archive-tbody');
             tbody.innerHTML = '';
-            
+
             let filtered = allArchiveData.filter(p => currentArchiveTab === 'daily' ? p.is_daily : !p.is_daily);
-            
+
             filtered.sort((a, b) => {
                 let valA = a[archiveSort.col];
                 let valB = b[archiveSort.col];
-                
-                if (valA === null || valA === undefined) valA = '';
-                if (valB === null || valB === undefined) valB = '';
-                
-                if (typeof valA === 'string') {
-                    return archiveSort.asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+
+                if (archiveSort.col === 'median_score' || archiveSort.col === 'solves') {
+                    valA = (valA === null || valA === undefined) ? -1 : Number(valA);
+                    valB = (valB === null || valB === undefined) ? -1 : Number(valB);
+                    return archiveSort.asc ? (valA - valB) : (valB - valA);
+                } else {
+                    if (valA === null || valA === undefined) valA = '';
+                    if (valB === null || valB === undefined) valB = '';
+                    return archiveSort.asc
+                        ? String(valA).localeCompare(String(valB))
+                        : String(valB).localeCompare(String(valA));
                 }
-                return archiveSort.asc ? (valA > valB ? 1 : -1) : (valB > valA ? 1 : -1);
             });
-            
+
             if (filtered.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">אין נתונים להצגה</td></tr>`;
                 return;
             }
-            
+
             filtered.forEach(p => {
                 const tr = document.createElement('tr');
                 const dateStr = p.created_at ? new Date(p.created_at).toLocaleDateString('he-IL') : '-';
                 const link = `/?id=${p.id}`;
-                
+
                 const scoreDisplay = p.median_score != null ? `${p.median_score.toFixed(1)} / 10` : '-';
-                
+
                 tr.innerHTML = `
                     <td><a href="${link}">${dateStr}</a></td>
                     <td><a href="${link}">${p.title || 'ללא כותרת'}</a></td>
@@ -1302,7 +1359,7 @@
                 extract: article.extract,
                 categories: article.activeCategories
             }));
-            
+
             const titleInput = document.getElementById('manual-title-input');
             const titleVal = titleInput ? titleInput.value.trim() : "";
 
@@ -1317,9 +1374,9 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payloadBody)
                 });
-                
+
                 if (!response.ok) throw new Error("Failed to save puzzle");
-                
+
                 const data = await response.json();
                 const newUrl = window.location.origin + window.location.pathname + '?id=' + data.id;
                 document.getElementById('generated-link').value = newUrl;
@@ -1341,15 +1398,15 @@
         }
 
         // Event Listeners
-        elGuessForm.addEventListener('submit', function(event) {
+        elGuessForm.addEventListener('submit', function (event) {
             // Stop the form from refreshing the page
-            event.preventDefault(); 
-            checkGuess(); 
+            event.preventDefault();
+            checkGuess();
         });
 
         elNextBtn.addEventListener('click', nextRound);
         elRetroBtn.addEventListener('click', claimRetroPoints);
-        
+
         elShowCreatorBtns.forEach(btn => btn.addEventListener('click', showCreator));
         elGenerateLinkBtn.addEventListener('click', createGameLink);
 
@@ -1357,4 +1414,5 @@
         initGame();
     </script>
 </body>
+
 </html>
