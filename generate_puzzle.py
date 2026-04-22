@@ -1,18 +1,12 @@
-import asyncio
 import os
-import json
 import logging
-import httpx
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+import random
+import re
 from supabase import create_client, Client
-from typing import List
 from dotenv import load_dotenv
-import requests
-import datetime
 
-from wiki_utils import get_wikipedia_pages, select_pages_subset
+import llm_utils
+from wiki_utils import get_wikipedia_pages
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -22,22 +16,64 @@ supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_
 
 def create_new_puzzle():
     """Generates list of 10 wikipedia articles, and saves as daily puzzle."""
-    num_random_articles = 100
-    logging.info(f"Fetching {num_random_articles} random Wikipedia articles")
-    random_data = get_wikipedia_pages(limit=100)
-    logging.info(f"Fetched {len(random_data)} random Wikipedia articles")
-    ai_picks = select_pages_subset(random_data)
-    logging.info(f"AI selected {len(ai_picks)} articles for the puzzle: {[item['title'] for item in ai_picks]}")
+    themes = llm_utils.pick_themes()
+    theme = random.choice(themes)
+    logging.info(f"Selected theme for today's puzzle: {theme}, out of these options: {themes}")
+    titles = llm_utils.pick_articles(theme)
+    logging.info(f"AI selected list of %d articles: %s", len(titles), titles)
+    pages_with_metadata = get_wikipedia_pages(titles=titles)
+    ai_picks = llm_utils.filter_list(pages_with_metadata)
+    logging.info(f"AI filtered the list down to {len(ai_picks)} articles: {[(item['title']) for item in ai_picks]}")
+
+    # Add aliases automatically
+    ai_picks = [add_aliases(item) for item in ai_picks]
+    # Clean categories
+    ai_picks = [clean_categories(item) for item in ai_picks]
     
     # Save to Supabase
     new_puzzle = {
         "is_daily": True,
-        "title": f"חידה יומית - {datetime.date.today().strftime('%d/%m/%Y')}",
+        "title": f"חידה יומית: {theme}",
         "data": ai_picks
     }
     result = supabase.table("puzzles").insert(new_puzzle).execute()
     logging.info(f"New daily puzzle created with ID: {result.data[0]['id']}")
     return {"message": "Daily puzzle generated successfully", "puzzle": result.data[0]}
+
+def add_aliases(item: dict) -> dict:
+    """Adds an 'aliases' field to the item dict, which is a list of alternative names for the article."""
+    title = item['title']
+    aliases = []
+
+    # If title contains parentheses, add the part before parentheses as an alias.
+    if '(' in title:
+        alias = title.split('(')[0].strip()
+        aliases.append(alias)
+
+    item["aliases"] = aliases
+    return item
+
+def normalize_str(s: str) -> str:
+    # Remove all characters except:
+    # - word chars (\w)
+    # - whitespace (\s)
+    # - Hebrew Unicode range (\u0590-\u05FF)
+    s = re.sub(r'[^\w\s\u0590-\u05FF]', '', s, flags=re.IGNORECASE)
+    
+    # Remove all whitespace
+    s = re.sub(r'\s+', '', s)
+    
+    # Trim (mostly redundant after removing whitespace, but kept for parity)
+    return s.strip()
+
+def clean_categories(item: dict) -> dict:
+    """Renames / removes categories based on what we want to show users."""
+    clean_titles = [normalize_str(a) for a in [item["title"]] + item.get("aliases", [])]
+    for cat in item.get("categories", []):
+        clean_cat = normalize_str(cat)
+        if any(title in clean_cat for title in clean_titles):
+            item["categories"] = [c for c in item["categories"] if c != cat]
+    return item
 
 
 def main():

@@ -1,7 +1,7 @@
+import asyncio
 import logging
 import requests
-
-import llm_utils
+import httpx
 
 logging.basicConfig(level=logging.INFO)
 
@@ -80,33 +80,55 @@ def get_wikipedia_pages(limit=10, titles=None, lang="he"):
 def wiki_item_to_string(item) -> str:
     return item['title'] + "\n" + ', '.join(item['categories'])
 
-def select_pages_subset(json_items) -> list:
-    json_dict = {item["title"]: item for item in json_items}
-    input_list = [wiki_item_to_string(item) for item in json_items]
-    ai_picks = llm_utils.get_llm_picks(input_list)
-    result = []
-    for title, ai_categories in ai_picks:
-        assert title in json_dict, "Title %s selected by AI was not on the input list: %s" % (title, input_list)
-        new_item = json_dict[title]
-        new_item['categories'] = ai_categories
-        result.append(new_item)
-    return result
+async def search_single_page(client, query, lang="he"):
+    SEARCH_API_URL = f"https://api.wikimedia.org/core/v1/wikipedia/{lang}/search/page"
+    params = {"q": query, "limit": 1}
+    headers = {"User-Agent": "my-wiki-app (your@email.com)"}
     
+    resp = await client.get(SEARCH_API_URL, params=params, headers=headers)
+    resp.raise_for_status()
+    
+    data = resp.json()
+    
+    if not data.get("pages"):
+        return query, None
+    
+    page = data["pages"][0]
+    return query, {
+        "title": page["title"],
+        "url": f"https://en.wikipedia.org/wiki/{page['key']}"
+    }
+
+async def search_articles(queries, lang="he"):
+    async with httpx.AsyncClient(timeout=10, limits=httpx.Limits(max_connections=5)) as client:
+        tasks = [search_single_page(client, q, lang) for q in queries]
+        results = await asyncio.gather(*tasks)
+
+    return dict(results)
+
+
 
 if __name__ == "__main__":
     # --- Examples ---
     # 1. Get 5 Random Pages
-    print("--- RANDOM PAGES ---")
-    random_data = get_wikipedia_pages(limit=100)
-    import json
-    print(json.dumps(random_data, indent=4, ensure_ascii=False))
+    # print("--- RANDOM PAGES ---")
+    # random_data = get_wikipedia_pages(limit=100)
+    # import json
+    # print(json.dumps(random_data, indent=4, ensure_ascii=False))
 
-    ai_picks = select_pages_subset(random_data)
-    print("\n--- AI-SELECTED SUBSET ---")
-    print(json.dumps(ai_picks, indent=4, ensure_ascii=False))
+    # ai_picks = select_pages_subset(random_data)
+    # print("\n--- AI-SELECTED SUBSET ---")
+    # print(json.dumps(ai_picks, indent=4, ensure_ascii=False))
 
-    # 2. Get Hardcoded Pages
-    print("\n--- HARDCODED PAGES ---")
-    specific_titles = ["ישראל", "אלברט איינשטיין", "פיצה"]
-    hardcoded_data = get_wikipedia_pages(titles=specific_titles)
-    print(json.dumps(hardcoded_data, indent=4, ensure_ascii=False))
+    # # 2. Get Hardcoded Pages
+    # print("\n--- HARDCODED PAGES ---")
+    # specific_titles = ["ישראל", "אלברט איינשטיין", "פיצה"]
+    # hardcoded_data = get_wikipedia_pages(titles=specific_titles)
+    # print(json.dumps(hardcoded_data, indent=4, ensure_ascii=False))
+
+    print("--- SEARCH ---")
+    to_search = "תל אביב"
+    print(f"Searching for: {to_search}")
+    search_result = asyncio.run(search_articles([to_search, 'דגשגדשגש']))
+    print(search_result)
+    

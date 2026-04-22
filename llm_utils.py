@@ -1,10 +1,17 @@
+import asyncio
 import logging
 import os
 import requests
 from dotenv import load_dotenv
+from datetime import datetime
+
+from prompts import Prompt
+import wiki_utils
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
+
+DEFAULT_MODEL = "google/gemini-3.1-flash-lite-preview"
 
 def generate_model_response(prompt, model):
   api_key = os.getenv('OPENROUTER_API_KEY')
@@ -27,37 +34,15 @@ def generate_model_response(prompt, model):
   except Exception as e:
       return f"Don't feel no terror, but I've got an error: {e}"
 
-def get_llm_picks(input_list) -> list[tuple[str, list[str]]]:
+def filter_list_and_categories(input_list) -> list[tuple[str, list[str]]]:
     """
     AI-driven method to pick a subset from a list of random pages that would work.
-    Returns list, each item is an article title and the categories that should be shown for it.
+    Returns list, each item is an article title.
     """
-    PROMPT = """Catfishing is a game where players get the categories containing a secret wikipedia article, and need to guess which article is it.
-    You are given the following list of Wikipedia article titles, and the list of categories each article is contained in. Pick 10 that would work well as secret articles for this game.
-    Focus points:
-
-    1. Some of the categories are too revealing. For example, the category “Tbilisi” for the article about the city of Tbilisi, or the category “Shirley Temple” for the article about the article “Shirley Temple (Cocktail)”. Remove those categories when considering articles.
-    2. Don't pick articles that are impossible to guess from their categories (after filtering out the revealing categories mentioned above), For instance, if the only categories are “Geography” and “Japan”, this is too broad to guess any specific Japanese-geography-related article.
-    3. Don't pick articles that are too general/categorical. The article “Tetris” is good, the article “Video game” is not.
-    4. The articles should be relatively well known for the average Israeli. At least 1% of Israeli people should have heard of each of the topics before, according to your estimate.
-
-    Pick ten diverse articles, no two should belong to a similar area of life. Don't pick two music-related articles, two food-related articles etc.
-
-    Write the output in this specific format, without any header or intro:
-
-    <NUMBER>. Article: <ARTICLE_NAME>. Categories: <FILTERED_CATEGORY_LIST>
-
-    ARTICLE_NAME should be the exact title of the article as given in the input list.
-    FILTERED_CATEGORY_LIST should contain the list of categories, comma separated, after removing the revealing categories mentioned above.
-
-    The list of articles to select from:
-    {input_list}
-    """
-
     input_list_str = "\n\n".join(input_list)
-    prompt = PROMPT.format(input_list=input_list_str)
+    prompt = Prompt.FILTER_LIST.format(input_list=input_list_str)
     result = []
-    response = generate_model_response(prompt, model="google/gemini-3.1-flash-lite-preview")
+    response = generate_model_response(prompt, model=DEFAULT_MODEL)
     logging.info(f"AI response:\n{response}")
     for line in response.splitlines():
         if line.strip() == "":
@@ -73,3 +58,70 @@ def get_llm_picks(input_list) -> list[tuple[str, list[str]]]:
             print(f"Error parsing line: {line}. Error: {e}")
 
     return result
+
+def parse_response_list(response: str) -> list[str]:
+    result = []
+    for line in response.splitlines():
+        if line.strip() == "":
+            continue
+        if not line.split('.')[0].isdigit():
+            continue
+        try:
+            item = line.split(".", 1)[1].strip()
+            result.append(item)
+        except Exception as e:
+            print(f"Error parsing line: {line}. Error: {e}")
+
+    return result
+
+def filter_list(wiki_pages: list[dict]) -> list[dict]:
+    """
+    AI-driven method to pick a subset from a list of random pages that would work.
+    Returns list, each item is an article title.
+    """
+    articles_dict = {item["title"]: item for item in wiki_pages}
+    input_list = [wiki_utils.wiki_item_to_string(item) for item in wiki_pages]
+    input_list_str = "\n\n".join(input_list)
+    prompt = Prompt.FILTER_LIST.format(input_list=input_list_str)
+    response = generate_model_response(prompt, model=DEFAULT_MODEL)
+    chosen = parse_response_list(response)
+    assert len(chosen) == 10, "Expected AI to pick exactly 10 articles, but got %d. Response was:\n%s" % (len(chosen), response)
+    for title in chosen:
+        assert title in articles_dict, "Title %s selected by AI was not on the input list: %s" % (title, input_list)
+    result = [articles_dict[title] for title in chosen]
+    return result
+
+def pick_themes() -> list[str]:
+    """
+    AI-driven method to generate a list of theme proposals for the daily game.
+    Based on the date.
+    # TODO: Add theme generation based on popular news items?
+    """
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    prompt = Prompt.PICK_THEMES.format(date=date_str)
+    response = generate_model_response(prompt, model=DEFAULT_MODEL)
+    return parse_response_list(response)
+
+def pick_articles(theme) -> list[str]:
+    """
+    AI-driven method to generate a list of article proposals for a game, inspired by the given theme.
+    # TODO: Add hard-coded list of areas of life, to help pick diverse articles.
+    """
+    prompt = Prompt.PICK_ARTICLES.format(theme=theme)
+    response = generate_model_response(prompt, model=DEFAULT_MODEL)
+    proposed_articles = parse_response_list(response)
+    wiki_pages = asyncio.run(wiki_utils.search_articles(proposed_articles))
+    return [page['title'] for page in wiki_pages.values() if page is not None]
+
+
+if __name__ == "__main__":
+    themes = pick_themes()
+    print("Proposed themes:")
+    for t in themes:
+        print(t)
+
+    theme = 'פסח'
+    articles = pick_articles(theme)
+    print(f"Proposed articles for theme {theme}:")
+    for a in articles:
+        print(a)
