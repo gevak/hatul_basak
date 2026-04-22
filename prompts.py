@@ -81,7 +81,19 @@ class Prompt:
     4. The articles should be relatively well known for the average Israeli. At least 1% of Israeli people should have heard of each of the topics before, according to your estimate.
 
     Pick ten diverse articles, no two should belong to a similar area of life. Don't pick two music-related articles, two food-related articles etc.
-
+    For example, I made one themed for passover and I had the following article ideas:
+    שרהל'ה שרון (because we sing in passover)
+    מדבר אטקמה (because the story of passover takes place in the desert)
+    אביב גפן (because passover is in the spring, and his name is literally "spring")
+    אבן רוזטה (because it's related to ancient egypt like the story of passover)
+    צ'יצ'ן איצה (because it's a pyramid, which are associated with egypt)
+    רפלסיה גדולה (because it's the biggest flower, and passover is associated with the spring and blooming)
+    משפט הסדר הטוב (because it has the word סדר which is the name of the ritual meal in passover)
+    ביצת פברז'ה (because it's an egg, and eggs are part of the passover meal)
+    איגנץ זמלווייס (because he's associated with handwashing, and handwashing is part of the passover ritual)
+    סימן שאלה (because we ask questions during the passover meal)
+    משה בתיבה (because it's a famous dish named after moses)
+    
     Write the output in this specific format, without any header or intro:
 
     <NUMBER>. Article: <ARTICLE_NAME>. Categories: <FILTERED_CATEGORY_LIST>

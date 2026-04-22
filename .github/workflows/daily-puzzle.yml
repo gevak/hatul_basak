@@ -6,6 +6,11 @@ on:
     # midnight in Israel during standard time and 01:00 during daylight saving time.
     - cron: "0 22 * * *"
   workflow_dispatch:
+    inputs:
+      theme:
+        description: Optional theme to use instead of auto-generating one
+        required: false
+        type: string
 
 concurrency:
   group: daily-puzzle
@@ -32,4 +37,11 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        run: python generate_puzzle.py
+          PUZZLE_THEME: ${{ inputs.theme }}
+        shell: bash
+        run: |
+          if [ -n "$PUZZLE_THEME" ]; then
+            python generate_puzzle.py --theme "$PUZZLE_THEME"
+          else
+            python generate_puzzle.py
+          fi

@@ -1,3 +1,4 @@
+import argparse
 import os
 import logging
 import random
@@ -14,11 +15,15 @@ logging.basicConfig(level=logging.INFO)
 # Initialize Supabase
 supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
-def create_new_puzzle():
+def create_new_puzzle(theme: str | None = None):
     """Generates list of 10 wikipedia articles, and saves as daily puzzle."""
-    themes = llm_utils.pick_themes()
-    theme = random.choice(themes)
-    logging.info(f"Selected theme for today's puzzle: {theme}, out of these options: {themes}")
+    if theme:
+        logging.info("Using pre-selected theme for today's puzzle: %s", theme)
+    else:
+        themes = llm_utils.pick_themes()
+        theme = random.choice(themes)
+        logging.info("Selected theme for today's puzzle: %s, out of these options: %s", theme, themes)
+
     titles = llm_utils.pick_articles(theme)
     logging.info(f"AI selected list of %d articles: %s", len(titles), titles)
     pages_with_metadata = get_wikipedia_pages(titles=titles)
@@ -76,8 +81,20 @@ def clean_categories(item: dict) -> dict:
     return item
 
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--theme",
+        type=str,
+        help="Optional pre-selected theme to use instead of generating one.",
+    )
+    return parser.parse_args()
+
+
 def main():
-    create_new_puzzle()
+    args = parse_args()
+    theme = args.theme.strip() if args.theme else None
+    create_new_puzzle(theme=theme)
 
 if __name__ == "__main__":
     main()
